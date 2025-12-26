@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title} ?: 'Plataforma de Viajes'">Plataforma de Viajes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Tailwind + Flowbite -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.css" rel="stylesheet"/>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+<header class="bg-white border-b shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-red-600">Plataforma de Viajes</h1>
+
+        <ul class="flex gap-6 text-sm font-medium">
+            <li><a th:href="@{/}" class="hover:text-red-600">Inicio</a></li>
+            <li><a th:href="@{/paquetes}" class="hover:text-red-600">Paquetes</a></li>
+            <li><a href="#" class="hover:text-red-600">Ofertas</a></li>
+            <li><a href="#" class="hover:text-red-600">Contacto</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- 🔥 AQUÍ SE INSERTA EL CONTENIDO -->
+<main th:replace="${content}">
+    <!-- contenido dinámico -->
+</main>
+
+<footer class="bg-gray-900 text-gray-300 py-6 text-center text-sm">
+    © 2025 Plataforma de Viajes · Proyecto académico / profesional
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.js"></script>
+</body>
+</html>
