@@ -5,23 +5,135 @@
             <div class="relative h-72 md:h-96 overflow-hidden rounded-xl">
 
                 <div class="hidden duration-1000 ease-in-out" data-carousel-item>
-                    <img th:src="@{/img/inicio_hero.jpg}"
+                    <img th:src="@{/img/carrusel/inicio_hero.jpg}"
                          class="absolute w-full h-full object-cover">
                 </div>
 
                 <div class="hidden duration-1000 ease-in-out" data-carousel-item>
-                    <img th:src="@{/img/hero_2.jpg}"
+                    <img th:src="@{/img/carrusel/hero_2.jpg}"
                          class="absolute w-full h-full object-cover">
                 </div>
 
                 <div class="hidden duration-1000 ease-in-out" data-carousel-item>
-                    <img th:src="@{/img/hero_3.jpg}"
+                    <img th:src="@{/img/carrusel/hero_3.jpg}"
                          class="absolute w-full h-full object-cover">
                 </div>
 
             </div>
         </div>
 
+    </div>
+</section>
+
+<!-- Sección de Anuncios -->
+<section class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-8">
+            <span class="bg-red-100 text-red-800 text-sm font-medium px-4 py-1.5 rounded-full">
+                Ofertas Exclusivas
+            </span>
+            <h3 class="text-3xl font-bold mt-4 text-gray-900">Promociones del Mes</h3>
+            <p class="text-gray-600 mt-2">Aprovecha nuestras mejores ofertas antes de que terminen</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Anuncio 1 -->
+            <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
+                <a href="#">
+                    <div class="relative">
+                        <img class="rounded-t-lg w-full h-56 object-cover" th:src="@{/img/promociones/desc_30.png}" alt="Promoción 1">
+                        <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
+                            🔥 HOT SALE
+                        </span>
+                        <span class="absolute top-3 right-3 bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full">
+                            -30% OFF
+                        </span>
+                    </div>
+                </a>
+                <div class="p-5">
+                    <a href="#">
+                        <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Título del anuncio 1</h5>
+                    </a>
+                    <p class="mb-3 text-sm text-gray-600">Descripción breve del anuncio promocional.</p>
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                        Ver oferta
+                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Anuncio 2 -->
+            <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
+                <a href="#">
+                    <div class="relative">
+                        <img class="rounded-t-lg w-full h-56 object-cover" th:src="@{/img/promociones/desc_45.png}" alt="Promoción 2">
+                        <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                            ✈️ NUEVO
+                        </span>
+                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                            -45% OFF
+                        </span>
+                    </div>
+                </a>
+                <div class="p-5">
+                    <a href="#">
+                        <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Título del anuncio 2</h5>
+                    </a>
+                    <p class="mb-3 text-sm text-gray-600">Descripción breve del anuncio promocional.</p>
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                        Ver oferta
+                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Anuncio 3 -->
+            <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
+                <a href="#">
+                    <div class="relative">
+                        <img class="rounded-t-lg w-full h-56 object-cover" th:src="@{/img/promociones/desc_50.png}" alt="Promoción 3">
+                        <span class="absolute top-3 left-3 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                            ⭐ EXCLUSIVO
+                        </span>
+                        <span class="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                            -50% OFF
+                        </span>
+                    </div>
+                </a>
+                <div class="p-5">
+                    <a href="#">
+                        <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Título del anuncio 3</h5>
+                    </a>
+                    <p class="mb-3 text-sm text-gray-600">Descripción breve del anuncio promocional.</p>
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                        Ver oferta
+                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banner promocional adicional -->
+        <div class="mt-10 p-6 bg-gradient-to-r from-red-600 to-red-800 rounded-2xl shadow-lg">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-white text-center md:text-left">
+                    <h4 class="text-2xl font-bold">¿Buscas algo especial?</h4>
+                    <p class="text-red-100 mt-1">Contáctanos y armamos tu viaje a medida</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-6 py-3 text-sm font-semibold text-red-600 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                    <svg class="w-5 h-5 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                    </svg>
+                    Contactar ahora
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
