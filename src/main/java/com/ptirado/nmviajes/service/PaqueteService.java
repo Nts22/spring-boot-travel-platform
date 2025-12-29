@@ -2,20 +2,27 @@ package com.ptirado.nmviajes.service;
 
 import java.util.List;
 
+import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
 import com.ptirado.nmviajes.dto.api.response.PaqueteResponse;
+import com.ptirado.nmviajes.dto.form.PaqueteForm;
+import com.ptirado.nmviajes.viewmodel.PaqueteView;
 
 public interface PaqueteService {
 
     // API REST
     List<PaqueteResponse> listarParaApi();
     PaqueteResponse obtenerParaApi(Integer id);
-    PaqueteResponse crearDesdeApi();
-    PaqueteResponse actualizarDesdeApi(Integer id);
+    PaqueteResponse crearDesdeApi(PaqueteRequest request);
+    PaqueteResponse actualizarDesdeApi(Integer id, PaqueteRequest request);
     void eliminar(Integer id);
 
     // WEB
-    List<PaqueteResponse> listarParaWeb();
-    PaqueteResponse obtenerParaWeb(Integer id);
-    void crearDesdeForm();
-    void actualizarDesdeForm(Integer id);
+    List<PaqueteView> listarParaWeb();
+    PaqueteView obtenerParaWeb(Integer id);
+    void crearDesdeForm(PaqueteForm form);
+    void actualizarDesdeForm(Integer id, PaqueteForm form);
+
+    // Búsquedas adicionales
+    List<PaqueteResponse> listarPorDestino(Integer idDestino);
+    List<PaqueteResponse> listarActivos();
 }

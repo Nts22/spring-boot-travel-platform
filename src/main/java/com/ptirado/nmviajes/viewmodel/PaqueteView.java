@@ -15,7 +15,7 @@ public class PaqueteView {
     private String stockDisponible;
     private String estado;
     private Integer idDestino;
+    private String nombreDestino;
     private String fechaCreacionFormateada;
     private String fechaModificacionFormateada;
-
 }

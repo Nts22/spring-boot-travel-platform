@@ -14,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -62,5 +64,16 @@ public class Paquete {
     @ToString.Include(name = "destinoId")
     public Integer getDestinoId() {
         return destino != null ? destino.getIdDestino() : null;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.fechaCreacion = LocalDateTime.now();
+        this.estado = this.estado == null ? "ACT" : this.estado;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.fechaModificacion = LocalDateTime.now();
     }
 }
