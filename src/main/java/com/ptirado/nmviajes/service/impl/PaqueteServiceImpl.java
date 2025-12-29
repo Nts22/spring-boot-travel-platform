@@ -1,10 +1,12 @@
 package com.ptirado.nmviajes.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ptirado.nmviajes.constants.AppConstants;
 import com.ptirado.nmviajes.constants.MessageKeys;
 import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
 import com.ptirado.nmviajes.dto.api.response.PaqueteResponse;
@@ -126,7 +128,14 @@ public class PaqueteServiceImpl implements PaqueteService {
     @Override
     @Transactional(readOnly = true)
     public List<PaqueteResponse> listarActivos() {
-        List<Paquete> paquetes = paqueteRepository.findByEstado("ACT");
+        List<Paquete> paquetes = paqueteRepository.findByEstado(AppConstants.STATUS_ACTIVO);
+        return paqueteMapper.toResponseList(paquetes);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaqueteResponse> buscar(Integer idDestino, LocalDate fechaInicio, LocalDate fechaFin) {
+        List<Paquete> paquetes = paqueteRepository.buscar(idDestino, fechaInicio, fechaFin);
         return paqueteMapper.toResponseList(paquetes);
     }
 }

@@ -1,7 +1,9 @@
 package com.ptirado.nmviajes.controller.api;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ptirado.nmviajes.constants.ApiPaths;
@@ -74,5 +77,14 @@ public class PaqueteController {
     @GetMapping("/activos")
     public ResponseEntity<List<PaqueteResponse>> listarActivos() {
         return ResponseEntity.ok(paqueteService.listarActivos());
+    }
+
+    // BUSCAR CON FILTROS
+    @GetMapping("/buscar")
+    public ResponseEntity<List<PaqueteResponse>> buscar(
+            @RequestParam(required = false) Integer idDestino,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        return ResponseEntity.ok(paqueteService.buscar(idDestino, fechaInicio, fechaFin));
     }
 }

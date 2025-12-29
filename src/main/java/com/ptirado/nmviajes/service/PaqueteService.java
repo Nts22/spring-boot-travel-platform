@@ -1,5 +1,6 @@
 package com.ptirado.nmviajes.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
@@ -25,4 +26,5 @@ public interface PaqueteService {
     // Búsquedas adicionales
     List<PaqueteResponse> listarPorDestino(Integer idDestino);
     List<PaqueteResponse> listarActivos();
+    List<PaqueteResponse> buscar(Integer idDestino, LocalDate fechaInicio, LocalDate fechaFin);
 }
