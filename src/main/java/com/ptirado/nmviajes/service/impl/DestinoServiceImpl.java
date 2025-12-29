@@ -46,7 +46,7 @@ public class DestinoServiceImpl implements DestinoService {
             return; // no existe → OK
         Destino existente = optional.get();
         if (idActual == null || !existente.getIdDestino().equals(idActual)) {
-            throw new ConflictException(message.getMessage(MessageKeys.DESTINO_DUPLICATE));
+            throw new ConflictException(MessageKeys.DESTINO_DUPLICATE);
         }
     }
 
