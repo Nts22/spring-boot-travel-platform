@@ -1,6 +1,9 @@
 /**
- * Utilidades globales para la aplicacion
+ * Utilidades de UI para la aplicacion
  * @namespace NMViajes.Utils
+ *
+ * NOTA: El formateo de fechas, precios y tipos de datos se maneja desde el controlador.
+ * Este modulo solo contiene utilidades para diseño, renderizado y formularios.
  */
 window.NMViajes = window.NMViajes || {};
 
@@ -8,46 +11,7 @@ NMViajes.Utils = (function() {
     'use strict';
 
     /**
-     * Formatea un numero como precio en soles peruanos
-     * @param {number} precio - El precio a formatear
-     * @returns {string} Precio formateado (ej: "1,500.00")
-     */
-    function formatearPrecio(precio) {
-        return new Intl.NumberFormat('es-PE', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(precio);
-    }
-
-    /**
-     * Formatea una fecha ISO a formato peruano dd/mm/yyyy
-     * @param {string} fechaStr - Fecha en formato ISO (yyyy-mm-dd)
-     * @returns {string} Fecha formateada
-     */
-    function formatearFecha(fechaStr) {
-        if (!fechaStr) return '';
-        const fecha = new Date(fechaStr + 'T00:00:00');
-        return fecha.toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    }
-
-    /**
-     * Convierte fecha dd/mm/yyyy (Flowbite) a yyyy-mm-dd (API)
-     * @param {string} fechaStr - Fecha en formato dd/mm/yyyy
-     * @returns {string|null} Fecha en formato ISO o null
-     */
-    function parseFechaFlowbite(fechaStr) {
-        if (!fechaStr) return null;
-        const parts = fechaStr.split('/');
-        if (parts.length !== 3) return null;
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-
-    /**
-     * Crea una funcion con debounce
+     * Crea una funcion con debounce para evitar llamadas excesivas
      * @param {Function} func - Funcion a ejecutar
      * @param {number} wait - Tiempo de espera en ms
      * @returns {Function} Funcion con debounce
@@ -65,7 +29,7 @@ NMViajes.Utils = (function() {
     }
 
     /**
-     * Escapa caracteres HTML para prevenir XSS
+     * Escapa caracteres HTML para prevenir XSS en renderizado
      * @param {string} text - Texto a escapar
      * @returns {string} Texto escapado
      */
@@ -76,7 +40,7 @@ NMViajes.Utils = (function() {
     }
 
     /**
-     * Espera un tiempo determinado (para async/await)
+     * Espera un tiempo determinado (util para animaciones y transiciones)
      * @param {number} ms - Milisegundos a esperar
      * @returns {Promise} Promesa que se resuelve despues del tiempo
      */
@@ -86,9 +50,6 @@ NMViajes.Utils = (function() {
 
     // API publica
     return {
-        formatearPrecio,
-        formatearFecha,
-        parseFechaFlowbite,
         debounce,
         escapeHtml,
         sleep
