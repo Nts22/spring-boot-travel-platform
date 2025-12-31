@@ -1,5 +1,7 @@
 package com.ptirado.nmviajes.dto.form;
 
+import static com.ptirado.nmviajes.constants.ValidationConstants.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -24,14 +26,16 @@ public class PaqueteForm {
     private Integer idPaquete;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @Size(min = PAQUETE_NOMBRE_MIN, max = PAQUETE_NOMBRE_MAX,
+            message = "El nombre debe tener entre " + PAQUETE_NOMBRE_MIN + " y " + PAQUETE_NOMBRE_MAX + " caracteres")
     private String nombre;
 
-    @Size(max = 1000, message = "La descripción debe tener máximo 1000 caracteres")
+    @Size(max = PAQUETE_DESCRIPCION_MAX,
+            message = "La descripcion debe tener maximo " + PAQUETE_DESCRIPCION_MAX + " caracteres")
     private String descripcion;
 
     @NotNull(message = "El precio es obligatorio")
-    @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
+    @DecimalMin(value = PRECIO_MIN, message = "El precio debe ser mayor a 0")
     private BigDecimal precio;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
@@ -46,7 +50,7 @@ public class PaqueteForm {
     @Min(value = 0, message = "El stock disponible no puede ser negativo")
     private Integer stockDisponible;
 
-    @Size(max = 3, message = "El estado debe tener máximo 3 caracteres")
+    @Size(max = ESTADO_MAX, message = "El estado debe tener maximo " + ESTADO_MAX + " caracteres")
     private String estado;
 
     @NotNull(message = "El destino es obligatorio")

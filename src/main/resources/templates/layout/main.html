@@ -53,19 +53,23 @@
                 <form id="contact-form" class="space-y-4">
                     <div>
                         <label for="contact-nombre" class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
-                        <input type="text" name="nombre" id="contact-nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Tu nombre" required minlength="2" maxlength="100">
+                        <input type="text" name="nombre" id="contact-nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Tu nombre">
+                        <p id="error-nombre" class="mt-1 text-sm text-red-600 hidden"></p>
                     </div>
                     <div>
                         <label for="contact-email" class="block mb-2 text-sm font-medium text-gray-900">Correo electronico</label>
-                        <input type="email" name="email" id="contact-email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="correo@ejemplo.com" required maxlength="150">
+                        <input type="text" name="email" id="contact-email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="correo@ejemplo.com">
+                        <p id="error-email" class="mt-1 text-sm text-red-600 hidden"></p>
                     </div>
                     <div>
                         <label for="contact-telefono" class="block mb-2 text-sm font-medium text-gray-900">Telefono (opcional)</label>
-                        <input type="tel" name="telefono" id="contact-telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="+51 999 999 999" maxlength="20">
+                        <input type="text" name="telefono" id="contact-telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="+51 999 999 999">
+                        <p id="error-telefono" class="mt-1 text-sm text-red-600 hidden"></p>
                     </div>
                     <div>
                         <label for="contact-mensaje" class="block mb-2 text-sm font-medium text-gray-900">Mensaje</label>
-                        <textarea name="mensaje" id="contact-mensaje" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Cuentanos que destino te interesa..." required minlength="10" maxlength="2000"></textarea>
+                        <textarea name="mensaje" id="contact-mensaje" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Cuentanos que destino te interesa..."></textarea>
+                        <p id="error-mensaje" class="mt-1 text-sm text-red-600 hidden"></p>
                     </div>
                     <button type="submit" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors flex items-center justify-center gap-2">
                         <svg class="btn-spinner hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -109,6 +113,7 @@
 
 <!-- Scripts globales -->
 <script th:src="@{/js/core/toast.js}"></script>
+<script th:src="@{/js/core/form-handler.js}"></script>
 <script th:src="@{/js/modules/contacto-form.js}"></script>
 </body>
 </html>
