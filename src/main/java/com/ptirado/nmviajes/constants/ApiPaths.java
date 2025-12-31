@@ -21,4 +21,7 @@ public final class ApiPaths {
     // RESERVAS
     public static final String RESERVAS = API_BASE + "/reservas";
     public static final String RESERVAS_ID = "/{id}";
+
+    // CONTACTO
+    public static final String CONTACTO = API_BASE + "/contacto";
 }

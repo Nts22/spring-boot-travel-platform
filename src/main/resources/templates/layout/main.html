@@ -22,7 +22,7 @@
             <li><a th:href="@{/}" class="hover:text-red-600">Inicio</a></li>
             <li><a th:href="@{/paquetes}" class="hover:text-red-600">Paquetes</a></li>
             <li><a href="#" class="hover:text-red-600">Ofertas</a></li>
-            <li><a href="#" class="hover:text-red-600">Contacto</a></li>
+            <li><a href="#" data-modal-target="contact-modal" data-modal-toggle="contact-modal" class="hover:text-red-600 cursor-pointer">Contacto</a></li>
         </ul>
     </nav>
 </header>
@@ -50,25 +50,29 @@
             </div>
             <!-- Body del modal -->
             <div class="p-4 md:p-5">
-                <form class="space-y-4" action="#" method="POST">
+                <form id="contact-form" class="space-y-4">
                     <div>
-                        <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
-                        <input type="text" name="name" id="contact-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Tu nombre" required>
+                        <label for="contact-nombre" class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
+                        <input type="text" name="nombre" id="contact-nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Tu nombre" required minlength="2" maxlength="100">
                     </div>
                     <div>
-                        <label for="contact-email" class="block mb-2 text-sm font-medium text-gray-900">Correo electrónico</label>
-                        <input type="email" name="email" id="contact-email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="correo@ejemplo.com" required>
+                        <label for="contact-email" class="block mb-2 text-sm font-medium text-gray-900">Correo electronico</label>
+                        <input type="email" name="email" id="contact-email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="correo@ejemplo.com" required maxlength="150">
                     </div>
                     <div>
-                        <label for="contact-phone" class="block mb-2 text-sm font-medium text-gray-900">Teléfono</label>
-                        <input type="tel" name="phone" id="contact-phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="+51 999 999 999">
+                        <label for="contact-telefono" class="block mb-2 text-sm font-medium text-gray-900">Telefono (opcional)</label>
+                        <input type="tel" name="telefono" id="contact-telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="+51 999 999 999" maxlength="20">
                     </div>
                     <div>
-                        <label for="contact-message" class="block mb-2 text-sm font-medium text-gray-900">Mensaje</label>
-                        <textarea name="message" id="contact-message" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Cuéntanos qué destino te interesa..." required></textarea>
+                        <label for="contact-mensaje" class="block mb-2 text-sm font-medium text-gray-900">Mensaje</label>
+                        <textarea name="mensaje" id="contact-mensaje" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Cuentanos que destino te interesa..." required minlength="10" maxlength="2000"></textarea>
                     </div>
-                    <button type="submit" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
-                        Enviar mensaje
+                    <button type="submit" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors flex items-center justify-center gap-2">
+                        <svg class="btn-spinner hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="btn-text">Enviar mensaje</span>
                     </button>
                 </form>
                 <div class="mt-4 pt-4 border-t text-center">
@@ -102,5 +106,9 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.2/flowbite.min.js"></script>
+
+<!-- Scripts globales -->
+<script th:src="@{/js/core/toast.js}"></script>
+<script th:src="@{/js/modules/contacto-form.js}"></script>
 </body>
 </html>
