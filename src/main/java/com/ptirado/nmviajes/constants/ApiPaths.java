@@ -24,4 +24,8 @@ public final class ApiPaths {
 
     // CONTACTO
     public static final String CONTACTO = API_BASE + "/contacto";
+
+    // SERVICIOS ADICIONALES
+    public static final String SERVICIOS = API_BASE + "/servicios";
+    public static final String SERVICIOS_ID = "/{id}";
 }

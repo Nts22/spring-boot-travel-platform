@@ -70,4 +70,18 @@ public final class MessageKeys {
     public static final String USUARIO_PASSWORD_CHANGED = "usuario.password.changed";
     public static final String USUARIO_EMAIL_VERIFIED = "usuario.email.verified";
     public static final String USUARIO_PROFILE_PICTURE_UPDATED = "usuario.profile.picture.updated";
+
+    // ============================================================
+    // RESERVA
+    // ============================================================
+    public static final String RESERVA_NOT_FOUND = "reserva.notfound";
+    public static final String RESERVA_CREATED = "reserva.created";
+    public static final String RESERVA_INVALID = "reserva.invalid";
+    public static final String STOCK_INSUFICIENTE = "stock.insuficiente";
+
+    // ============================================================
+    // SERVICIO ADICIONAL
+    // ============================================================
+    public static final String SERVICIO_NOT_FOUND = "servicio.notfound";
+    public static final String SERVICIO_INACTIVE = "servicio.inactive";
 }

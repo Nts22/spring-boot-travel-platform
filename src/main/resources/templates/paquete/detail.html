@@ -69,10 +69,15 @@
 
             <!-- Botones -->
             <div class="flex gap-4">
-                <button th:disabled="${paquete.stockDisponible == null or paquete.stockDisponible == '0'}"
-                        class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <a th:if="${paquete.stockDisponible != null and paquete.stockDisponible != '0'}"
+                   th:href="@{/reservas/nueva/{id}(id=${paquete.idPaquete})}"
+                   class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition inline-block text-center">
                     Reservar ahora
-                </button>
+                </a>
+                <span th:if="${paquete.stockDisponible == null or paquete.stockDisponible == '0'}"
+                      class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed inline-block text-center">
+                    Reservar ahora
+                </span>
                 <a th:href="@{/paquetes}"
                    class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition">
                     Volver
