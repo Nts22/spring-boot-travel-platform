@@ -1,5 +1,35 @@
 package com.ptirado.nmviajes.service;
 
-public class ReservaService {
-    
+import java.util.List;
+
+import com.ptirado.nmviajes.dto.api.request.ReservaRequest;
+import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
+import com.ptirado.nmviajes.dto.form.ReservaForm;
+import com.ptirado.nmviajes.viewmodel.ReservaView;
+
+public interface ReservaService {
+
+    // ===========================================================
+    // API REST
+    // ===========================================================
+
+    List<ReservaResponse> listarParaApi();
+
+    ReservaResponse obtenerParaApi(Integer id);
+
+    ReservaResponse crearDesdeApi(ReservaRequest request);
+
+    List<ReservaResponse> listarPorUsuarioParaApi(Integer idUsuario);
+
+    // ===========================================================
+    // WEB MVC
+    // ===========================================================
+
+    List<ReservaView> listarParaWeb();
+
+    ReservaView obtenerParaWeb(Integer id);
+
+    void crearDesdeForm(ReservaForm form);
+
+    List<ReservaView> listarPorUsuarioParaWeb(Integer idUsuario);
 }
