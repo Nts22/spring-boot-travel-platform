@@ -1,10 +1,16 @@
 package com.ptirado.nmviajes.mapper;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.stereotype.Component;
 
 import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
+import com.ptirado.nmviajes.dto.api.response.PaqueteBuscadorResponse;
 import com.ptirado.nmviajes.dto.api.response.PaqueteResponse;
 import com.ptirado.nmviajes.dto.form.PaqueteForm;
 import com.ptirado.nmviajes.entity.Destino;
@@ -13,6 +19,27 @@ import com.ptirado.nmviajes.viewmodel.PaqueteView;
 
 @Component
 public class PaqueteMapper {
+
+    private static final Locale LOCALE_PE = new Locale("es", "PE");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance(LOCALE_PE);
+
+    static {
+        PRICE_FORMATTER.setMinimumFractionDigits(2);
+        PRICE_FORMATTER.setMaximumFractionDigits(2);
+    }
+
+    // ===========================================================
+    //               METODOS DE FORMATEO
+    // ===========================================================
+
+    private String formatearFecha(LocalDate fecha) {
+        return fecha != null ? fecha.format(DATE_FORMATTER) : "";
+    }
+
+    private String formatearPrecio(BigDecimal precio) {
+        return precio != null ? PRICE_FORMATTER.format(precio) : "0.00";
+    }
 
     // ===========================================================
     //               MAPEOS PARA API (JSON)
@@ -85,6 +112,35 @@ public class PaqueteMapper {
         paquete.setStockDisponible(request.getStockDisponible());
         paquete.setEstado(request.getEstado());
         paquete.setDestino(destino);
+    }
+
+    /**
+     * Convierte Entity → PaqueteBuscadorResponse (datos formateados para JS)
+     */
+    public PaqueteBuscadorResponse toBuscadorResponse(Paquete paquete) {
+        if (paquete == null) return null;
+
+        return PaqueteBuscadorResponse.builder()
+                .idPaquete(paquete.getIdPaquete())
+                .nombre(paquete.getNombre())
+                .descripcion(paquete.getDescripcion())
+                .precio(formatearPrecio(paquete.getPrecio()))
+                .fechaInicio(formatearFecha(paquete.getFechaInicio()))
+                .fechaFin(formatearFecha(paquete.getFechaFin()))
+                .stockDisponible(paquete.getStockDisponible())
+                .nombreDestino(paquete.getDestino() != null ? paquete.getDestino().getNombre() : null)
+                .build();
+    }
+
+    /**
+     * Lista de Entity → Lista de PaqueteBuscadorResponse
+     */
+    public List<PaqueteBuscadorResponse> toBuscadorResponseList(List<Paquete> paquetes) {
+        if (paquetes == null) return List.of();
+
+        return paquetes.stream()
+                .map(this::toBuscadorResponse)
+                .toList();
     }
 
     // ===========================================================

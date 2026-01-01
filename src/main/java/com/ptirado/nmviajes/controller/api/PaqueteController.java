@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ptirado.nmviajes.constants.ApiPaths;
 import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
+import com.ptirado.nmviajes.dto.api.response.PaqueteBuscadorResponse;
 import com.ptirado.nmviajes.dto.api.response.PaqueteResponse;
 import com.ptirado.nmviajes.service.PaqueteService;
 
@@ -79,9 +80,9 @@ public class PaqueteController {
         return ResponseEntity.ok(paqueteService.listarActivos());
     }
 
-    // BUSCAR CON FILTROS
+    // BUSCAR CON FILTROS (retorna datos formateados para el buscador JS)
     @GetMapping("/buscar")
-    public ResponseEntity<List<PaqueteResponse>> buscar(
+    public ResponseEntity<List<PaqueteBuscadorResponse>> buscar(
             @RequestParam(required = false) Integer idDestino,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {

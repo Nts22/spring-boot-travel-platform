@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ptirado.nmviajes.constants.AppConstants;
 import com.ptirado.nmviajes.constants.MessageKeys;
 import com.ptirado.nmviajes.dto.api.request.PaqueteRequest;
+import com.ptirado.nmviajes.dto.api.response.PaqueteBuscadorResponse;
 import com.ptirado.nmviajes.dto.api.response.PaqueteResponse;
 import com.ptirado.nmviajes.dto.form.PaqueteForm;
 import com.ptirado.nmviajes.entity.Destino;
@@ -134,8 +135,8 @@ public class PaqueteServiceImpl implements PaqueteService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PaqueteResponse> buscar(Integer idDestino, LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<PaqueteBuscadorResponse> buscar(Integer idDestino, LocalDate fechaInicio, LocalDate fechaFin) {
         List<Paquete> paquetes = paqueteRepository.buscar(idDestino, fechaInicio, fechaFin);
-        return paqueteMapper.toResponseList(paquetes);
+        return paqueteMapper.toBuscadorResponseList(paquetes);
     }
 }

@@ -3,6 +3,8 @@
  * @namespace NMViajes.PaqueteBuscador
  * @requires NMViajes.Utils
  * @requires NMViajes.Toast
+ *
+ * NOTA: Los datos (fechas, precios) vienen formateados desde el controlador.
  */
 window.NMViajes = window.NMViajes || {};
 
@@ -27,6 +29,7 @@ NMViajes.PaqueteBuscador = (function() {
 
     /**
      * Crea el HTML de una card de paquete
+     * Los campos precio, fechaInicio, fechaFin ya vienen formateados del servidor
      */
     function crearCardPaquete(paquete) {
         const stockHtml = paquete.stockDisponible && paquete.stockDisponible > 0
@@ -46,7 +49,7 @@ NMViajes.PaqueteBuscador = (function() {
                 <div class="p-5">
                     <h3 class="text-lg font-semibold">${Utils.escapeHtml(paquete.nombre)}</h3>
                     <p class="text-sm text-gray-500 mt-1">
-                        ${Utils.formatearFecha(paquete.fechaInicio)} - ${Utils.formatearFecha(paquete.fechaFin)}
+                        ${paquete.fechaInicio} - ${paquete.fechaFin}
                         ${destinoHtml}
                     </p>
 
@@ -54,7 +57,7 @@ NMViajes.PaqueteBuscador = (function() {
 
                     <div class="flex justify-between items-center mt-4">
                         <span class="text-xl font-bold text-red-600">
-                            S/ ${Utils.formatearPrecio(paquete.precio)}
+                            S/ ${paquete.precio}
                         </span>
 
                         <a href="/paquetes/${paquete.idPaquete}"
@@ -124,6 +127,16 @@ NMViajes.PaqueteBuscador = (function() {
     }
 
     /**
+     * Convierte fecha dd/mm/yyyy (Flowbite) a yyyy-mm-dd (API)
+     */
+    function parseFechaFlowbite(fechaStr) {
+        if (!fechaStr) return null;
+        const parts = fechaStr.split('/');
+        if (parts.length !== 3) return null;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    /**
      * Ejecuta la busqueda de paquetes
      */
     async function buscar() {
@@ -133,12 +146,12 @@ NMViajes.PaqueteBuscador = (function() {
             params.append('idDestino', DOM.filtroDestino.value);
         }
 
-        const fechaInicio = Utils.parseFechaFlowbite(DOM.filtroFechaInicio?.value);
+        const fechaInicio = parseFechaFlowbite(DOM.filtroFechaInicio?.value);
         if (fechaInicio) {
             params.append('fechaInicio', fechaInicio);
         }
 
-        const fechaFin = Utils.parseFechaFlowbite(DOM.filtroFechaFin?.value);
+        const fechaFin = parseFechaFlowbite(DOM.filtroFechaFin?.value);
         if (fechaFin) {
             params.append('fechaFin', fechaFin);
         }
