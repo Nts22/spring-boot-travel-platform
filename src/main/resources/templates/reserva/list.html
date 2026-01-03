@@ -32,9 +32,8 @@
             <thead class="bg-gray-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">#</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Paquete</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Destino</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha Viaje</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Paquetes</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha Reserva</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Total</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Acciones</th>
@@ -43,9 +42,13 @@
             <tbody class="divide-y divide-gray-200">
                 <tr th:each="reserva : ${reservas}" class="hover:bg-gray-50">
                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.idReserva}">1</td>
-                    <td class="px-6 py-4 text-sm text-gray-800 font-medium" th:text="${reserva.nombrePaquete}">Paquete</td>
-                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.nombreDestino}">Destino</td>
-                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.fechaViajeInicioFormateada}">01/01/2025</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">
+                        <div th:each="item : ${reserva.items}" class="mb-1">
+                            <span class="font-medium" th:text="${item.nombrePaquete}">Paquete</span>
+                            <span class="text-gray-500" th:text="' - ' + ${item.nombreDestino}"> - Destino</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.fechaCreacionFormateada}">01/01/2025</td>
                     <td class="px-6 py-4 text-sm text-red-600 font-bold" th:text="${reserva.totalPagarFormateado}">S/ 0.00</td>
                     <td class="px-6 py-4">
                         <span th:class="${reserva.estadoReserva == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' :

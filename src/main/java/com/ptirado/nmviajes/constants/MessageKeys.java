@@ -84,4 +84,15 @@ public final class MessageKeys {
     // ============================================================
     public static final String SERVICIO_NOT_FOUND = "servicio.notfound";
     public static final String SERVICIO_INACTIVE = "servicio.inactive";
+
+    // ============================================================
+    // CARRITO
+    // ============================================================
+    public static final String CARRITO_VACIO = "carrito.vacio";
+    public static final String CARRITO_ITEM_NOT_FOUND = "carrito.item.notfound";
+    public static final String CARRITO_ITEM_DUPLICADO = "carrito.item.duplicado";
+    public static final String CARRITO_ITEM_AGREGADO = "carrito.item.agregado";
+    public static final String CARRITO_ITEM_ELIMINADO = "carrito.item.eliminado";
+    public static final String CARRITO_VACIADO = "carrito.vaciado";
+    public static final String CARRITO_COMPRA_PROCESADA = "carrito.compra.procesada";
 }

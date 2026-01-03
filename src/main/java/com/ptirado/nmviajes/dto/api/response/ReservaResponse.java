@@ -1,7 +1,6 @@
 package com.ptirado.nmviajes.dto.api.response;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import lombok.NoArgsConstructor;
 public class ReservaResponse {
 
     private Integer idReserva;
-    private LocalDate fechaViajeInicio;
     private BigDecimal totalPagar;
     private String estadoReserva;
     private String estado;
@@ -31,11 +29,6 @@ public class ReservaResponse {
     private String nombreUsuario;
     private String emailUsuario;
 
-    // Datos del paquete
-    private Integer idPaquete;
-    private String nombrePaquete;
-    private BigDecimal precioPaquete;
-
-    // Servicios adicionales
-    private List<ReservaServicioResponse> serviciosAdicionales;
+    // Items de la reserva (paquetes)
+    private List<ReservaItemResponse> items;
 }

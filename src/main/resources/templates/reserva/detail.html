@@ -27,38 +27,44 @@
                   th:text="${reserva.estadoReserva}">PENDIENTE</span>
         </div>
 
-        <!-- Detalles del Paquete -->
+        <!-- Items de la Reserva (Paquetes) -->
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-3">Paquete Reservado</h3>
-            <div class="bg-gray-50 rounded-lg p-4">
-                <p class="text-xl font-bold text-gray-800" th:text="${reserva.nombrePaquete}">Nombre del Paquete</p>
-                <p class="text-gray-600">Destino: <span th:text="${reserva.nombreDestino}">Destino</span></p>
-                <p class="text-gray-600">Fecha de viaje: <span th:text="${reserva.fechaViajeInicioFormateada}">01/01/2025</span></p>
-                <p class="text-red-600 font-semibold mt-2">Precio base: <span th:text="${reserva.precioPaqueteFormateado}">S/ 0.00</span></p>
-            </div>
-        </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-3">Paquetes Reservados</h3>
 
-        <!-- Servicios Adicionales -->
-        <div th:if="${reserva.serviciosAdicionales != null and !#lists.isEmpty(reserva.serviciosAdicionales)}" class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-3">Servicios Adicionales</h3>
-            <table class="w-full">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-2 text-left text-sm">Servicio</th>
-                        <th class="px-4 py-2 text-right text-sm">Precio Unit.</th>
-                        <th class="px-4 py-2 text-center text-sm">Cantidad</th>
-                        <th class="px-4 py-2 text-right text-sm">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="servicio : ${reserva.serviciosAdicionales}" class="border-b">
-                        <td class="px-4 py-2" th:text="${servicio.nombreServicio}">Servicio</td>
-                        <td class="px-4 py-2 text-right" th:text="${servicio.costoUnitarioFormateado}">S/ 0.00</td>
-                        <td class="px-4 py-2 text-center" th:text="${servicio.cantidad}">1</td>
-                        <td class="px-4 py-2 text-right font-medium" th:text="${servicio.subtotalFormateado}">S/ 0.00</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div th:each="item, iterStat : ${reserva.items}" class="bg-gray-50 rounded-lg p-4 mb-4">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="text-xl font-bold text-gray-800" th:text="${item.nombrePaquete}">Nombre del Paquete</p>
+                        <p class="text-gray-600">Destino: <span th:text="${item.nombreDestino}">Destino</span></p>
+                        <p class="text-gray-600">Fecha de viaje: <span th:text="${item.fechaViajeInicioFormateada}">01/01/2025</span></p>
+                        <p class="text-gray-500 text-sm mt-1">Precio base: <span th:text="${item.precioPaqueteFormateado}">S/ 0.00</span></p>
+                    </div>
+                    <p class="text-red-600 font-bold text-lg" th:text="${item.subtotalFormateado}">S/ 0.00</p>
+                </div>
+
+                <!-- Servicios Adicionales del Item -->
+                <div th:if="${item.serviciosAdicionales != null and !#lists.isEmpty(item.serviciosAdicionales)}" class="mt-4 pt-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-600 mb-2">Servicios adicionales:</p>
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-3 py-1 text-left">Servicio</th>
+                                <th class="px-3 py-1 text-right">Precio Unit.</th>
+                                <th class="px-3 py-1 text-center">Cant.</th>
+                                <th class="px-3 py-1 text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="servicio : ${item.serviciosAdicionales}" class="border-b border-gray-100">
+                                <td class="px-3 py-1" th:text="${servicio.nombreServicio}">Servicio</td>
+                                <td class="px-3 py-1 text-right" th:text="${servicio.costoUnitarioFormateado}">S/ 0.00</td>
+                                <td class="px-3 py-1 text-center" th:text="${servicio.cantidad}">1</td>
+                                <td class="px-3 py-1 text-right font-medium" th:text="${servicio.subtotalFormateado}">S/ 0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Total -->

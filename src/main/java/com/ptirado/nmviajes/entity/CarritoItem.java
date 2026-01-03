@@ -1,6 +1,6 @@
 package com.ptirado.nmviajes.entity;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,41 +23,42 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "reserva")
+@Table(name = "carrito_item")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Reserva {
+public class CarritoItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
     @EqualsAndHashCode.Include
-    private Integer idReserva;
+    private Integer idItem;
 
     @ToString.Include
-    private BigDecimal totalPagar;
+    private LocalDate fechaViajeInicio;
 
-    private String estadoReserva;
-    private String estado;
-    private LocalDateTime fechaCreacion;
-    private LocalDateTime fechaModificacion;
+    private LocalDateTime fechaAgregado;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario")
-    private Usuario usuario;
+    @JoinColumn(name = "id_carrito")
+    private Carrito carrito;
 
-    @OneToMany(mappedBy = "reserva", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReservaItem> items = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_paquete")
+    private Paquete paquete;
 
-    @ToString.Include(name = "usuarioId")
-    public Integer getUsuarioId() {
-        return usuario != null ? usuario.getIdUsuario() : null;
+    @OneToMany(mappedBy = "carritoItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarritoItemServicio> servicios = new ArrayList<>();
+
+    @ToString.Include(name = "carritoId")
+    public Integer getCarritoId() {
+        return carrito != null ? carrito.getIdCarrito() : null;
     }
 
-    @ToString.Include(name = "cantidadItems")
-    public int getCantidadItems() {
-        return items != null ? items.size() : 0;
+    @ToString.Include(name = "paqueteId")
+    public Integer getPaqueteId() {
+        return paquete != null ? paquete.getIdPaquete() : null;
     }
 }

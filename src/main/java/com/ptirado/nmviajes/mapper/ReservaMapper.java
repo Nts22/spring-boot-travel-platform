@@ -10,11 +10,14 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Component;
 
+import com.ptirado.nmviajes.dto.api.response.ReservaItemResponse;
+import com.ptirado.nmviajes.dto.api.response.ReservaItemServicioResponse;
 import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
-import com.ptirado.nmviajes.dto.api.response.ReservaServicioResponse;
 import com.ptirado.nmviajes.entity.Reserva;
-import com.ptirado.nmviajes.entity.ReservaServicio;
-import com.ptirado.nmviajes.viewmodel.ReservaServicioView;
+import com.ptirado.nmviajes.entity.ReservaItem;
+import com.ptirado.nmviajes.entity.ReservaItemServicio;
+import com.ptirado.nmviajes.viewmodel.ReservaItemServicioView;
+import com.ptirado.nmviajes.viewmodel.ReservaItemView;
 import com.ptirado.nmviajes.viewmodel.ReservaView;
 
 @Component
@@ -55,7 +58,6 @@ public class ReservaMapper {
 
         return ReservaResponse.builder()
                 .idReserva(reserva.getIdReserva())
-                .fechaViajeInicio(reserva.getFechaViajeInicio())
                 .totalPagar(reserva.getTotalPagar())
                 .estadoReserva(reserva.getEstadoReserva())
                 .estado(reserva.getEstado())
@@ -65,12 +67,8 @@ public class ReservaMapper {
                 .nombreUsuario(reserva.getUsuario() != null ?
                     reserva.getUsuario().getNombre() + " " + reserva.getUsuario().getApellido() : null)
                 .emailUsuario(reserva.getUsuario() != null ? reserva.getUsuario().getEmail() : null)
-                // Paquete
-                .idPaquete(reserva.getPaquete() != null ? reserva.getPaquete().getIdPaquete() : null)
-                .nombrePaquete(reserva.getPaquete() != null ? reserva.getPaquete().getNombre() : null)
-                .precioPaquete(reserva.getPaquete() != null ? reserva.getPaquete().getPrecio() : null)
-                // Servicios
-                .serviciosAdicionales(toServicioResponseList(reserva.getReservasServicios()))
+                // Items
+                .items(toItemResponseList(reserva.getItems()))
                 .build();
     }
 
@@ -81,29 +79,54 @@ public class ReservaMapper {
                 .toList();
     }
 
-    public ReservaServicioResponse toServicioResponse(ReservaServicio rs) {
-        if (rs == null) return null;
+    public ReservaItemResponse toItemResponse(ReservaItem item) {
+        if (item == null) return null;
 
-        BigDecimal costoUnitario = rs.getServicioAdicional() != null ?
-            rs.getServicioAdicional().getCosto() : BigDecimal.ZERO;
-        Integer cantidad = rs.getCantidad() != null ? rs.getCantidad() : 0;
+        return ReservaItemResponse.builder()
+                .idItem(item.getIdItem())
+                .fechaViajeInicio(item.getFechaViajeInicio())
+                .subtotal(item.getSubtotal())
+                // Paquete
+                .idPaquete(item.getPaquete() != null ? item.getPaquete().getIdPaquete() : null)
+                .nombrePaquete(item.getPaquete() != null ? item.getPaquete().getNombre() : null)
+                .precioPaquete(item.getPaquete() != null ? item.getPaquete().getPrecio() : null)
+                .nombreDestino(item.getPaquete() != null && item.getPaquete().getDestino() != null ?
+                    item.getPaquete().getDestino().getNombre() : null)
+                // Servicios
+                .serviciosAdicionales(toItemServicioResponseList(item.getServicios()))
+                .build();
+    }
+
+    public List<ReservaItemResponse> toItemResponseList(List<ReservaItem> items) {
+        if (items == null) return List.of();
+        return items.stream()
+                .map(this::toItemResponse)
+                .toList();
+    }
+
+    public ReservaItemServicioResponse toItemServicioResponse(ReservaItemServicio ris) {
+        if (ris == null) return null;
+
+        BigDecimal costoUnitario = ris.getServicioAdicional() != null ?
+            ris.getServicioAdicional().getCosto() : BigDecimal.ZERO;
+        Integer cantidad = ris.getCantidad() != null ? ris.getCantidad() : 0;
         BigDecimal subtotal = costoUnitario.multiply(BigDecimal.valueOf(cantidad));
 
-        return ReservaServicioResponse.builder()
-                .idServicio(rs.getServicioAdicional() != null ?
-                    rs.getServicioAdicional().getIdServicio() : null)
-                .nombreServicio(rs.getServicioAdicional() != null ?
-                    rs.getServicioAdicional().getNombre() : null)
+        return ReservaItemServicioResponse.builder()
+                .idServicio(ris.getServicioAdicional() != null ?
+                    ris.getServicioAdicional().getIdServicio() : null)
+                .nombreServicio(ris.getServicioAdicional() != null ?
+                    ris.getServicioAdicional().getNombre() : null)
                 .costoUnitario(costoUnitario)
                 .cantidad(cantidad)
                 .subtotal(subtotal)
                 .build();
     }
 
-    public List<ReservaServicioResponse> toServicioResponseList(List<ReservaServicio> servicios) {
+    public List<ReservaItemServicioResponse> toItemServicioResponseList(List<ReservaItemServicio> servicios) {
         if (servicios == null) return List.of();
         return servicios.stream()
-                .map(this::toServicioResponse)
+                .map(this::toItemServicioResponse)
                 .toList();
     }
 
@@ -116,7 +139,6 @@ public class ReservaMapper {
 
         ReservaView view = new ReservaView();
         view.setIdReserva(reserva.getIdReserva());
-        view.setFechaViajeInicioFormateada(formatearFecha(reserva.getFechaViajeInicio()));
         view.setTotalPagarFormateado(formatearPrecio(reserva.getTotalPagar()));
         view.setEstadoReserva(reserva.getEstadoReserva());
         view.setEstado(reserva.getEstado());
@@ -130,18 +152,8 @@ public class ReservaMapper {
             view.setEmailUsuario(reserva.getUsuario().getEmail());
         }
 
-        // Paquete
-        if (reserva.getPaquete() != null) {
-            view.setIdPaquete(reserva.getPaquete().getIdPaquete());
-            view.setNombrePaquete(reserva.getPaquete().getNombre());
-            view.setPrecioPaqueteFormateado(formatearPrecio(reserva.getPaquete().getPrecio()));
-            if (reserva.getPaquete().getDestino() != null) {
-                view.setNombreDestino(reserva.getPaquete().getDestino().getNombre());
-            }
-        }
-
-        // Servicios
-        view.setServiciosAdicionales(toServicioViewList(reserva.getReservasServicios()));
+        // Items
+        view.setItems(toItemViewList(reserva.getItems()));
 
         return view;
     }
@@ -153,19 +165,50 @@ public class ReservaMapper {
                 .toList();
     }
 
-    public ReservaServicioView toServicioView(ReservaServicio rs) {
-        if (rs == null) return null;
+    public ReservaItemView toItemView(ReservaItem item) {
+        if (item == null) return null;
 
-        BigDecimal costoUnitario = rs.getServicioAdicional() != null ?
-            rs.getServicioAdicional().getCosto() : BigDecimal.ZERO;
-        Integer cantidad = rs.getCantidad() != null ? rs.getCantidad() : 0;
+        ReservaItemView view = new ReservaItemView();
+        view.setIdItem(item.getIdItem());
+        view.setFechaViajeInicioFormateada(formatearFecha(item.getFechaViajeInicio()));
+        view.setSubtotalFormateado(formatearPrecio(item.getSubtotal()));
+
+        // Paquete
+        if (item.getPaquete() != null) {
+            view.setIdPaquete(item.getPaquete().getIdPaquete());
+            view.setNombrePaquete(item.getPaquete().getNombre());
+            view.setPrecioPaqueteFormateado(formatearPrecio(item.getPaquete().getPrecio()));
+            if (item.getPaquete().getDestino() != null) {
+                view.setNombreDestino(item.getPaquete().getDestino().getNombre());
+            }
+        }
+
+        // Servicios
+        view.setServiciosAdicionales(toItemServicioViewList(item.getServicios()));
+
+        return view;
+    }
+
+    public List<ReservaItemView> toItemViewList(List<ReservaItem> items) {
+        if (items == null) return List.of();
+        return items.stream()
+                .map(this::toItemView)
+                .toList();
+    }
+
+    public ReservaItemServicioView toItemServicioView(ReservaItemServicio ris) {
+        if (ris == null) return null;
+
+        BigDecimal costoUnitario = ris.getServicioAdicional() != null ?
+            ris.getServicioAdicional().getCosto() : BigDecimal.ZERO;
+        Integer cantidad = ris.getCantidad() != null ? ris.getCantidad() : 0;
         BigDecimal subtotal = costoUnitario.multiply(BigDecimal.valueOf(cantidad));
 
-        ReservaServicioView view = new ReservaServicioView();
-        view.setIdServicio(rs.getServicioAdicional() != null ?
-            rs.getServicioAdicional().getIdServicio() : null);
-        view.setNombreServicio(rs.getServicioAdicional() != null ?
-            rs.getServicioAdicional().getNombre() : null);
+        ReservaItemServicioView view = new ReservaItemServicioView();
+        view.setIdServicio(ris.getServicioAdicional() != null ?
+            ris.getServicioAdicional().getIdServicio() : null);
+        view.setNombreServicio(ris.getServicioAdicional() != null ?
+            ris.getServicioAdicional().getNombre() : null);
         view.setCostoUnitarioFormateado(formatearPrecio(costoUnitario));
         view.setCantidad(cantidad);
         view.setSubtotalFormateado(formatearPrecio(subtotal));
@@ -173,10 +216,10 @@ public class ReservaMapper {
         return view;
     }
 
-    public List<ReservaServicioView> toServicioViewList(List<ReservaServicio> servicios) {
+    public List<ReservaItemServicioView> toItemServicioViewList(List<ReservaItemServicio> servicios) {
         if (servicios == null) return List.of();
         return servicios.stream()
-                .map(this::toServicioView)
+                .map(this::toItemServicioView)
                 .toList();
     }
 }
