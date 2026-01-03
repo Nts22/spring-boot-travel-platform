@@ -7,6 +7,8 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,6 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -39,10 +43,43 @@ public class Reserva {
     @ToString.Include
     private BigDecimal totalPagar;
 
-    private String estadoReserva;
+    @Enumerated(EnumType.STRING)
+    private EstadoReserva estadoReserva;
+
     private String estado;
+
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaModificacion;
+
+    @PrePersist
+    protected void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+        if (estadoReserva == null) {
+            estadoReserva = EstadoReserva.PENDIENTE;
+        }
+        if (estado == null) {
+            estado = "ACT";
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        fechaModificacion = LocalDateTime.now();
+    }
+
+    public void confirmarPago() {
+        this.estadoReserva = EstadoReserva.PAGADA;
+    }
+
+    public boolean estaFinalizada() {
+        return this.estadoReserva == EstadoReserva.PAGADA;
+    }
+
+    public enum EstadoReserva {
+        PENDIENTE,
+        PAGADA,
+        CANCELADA
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")

@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ptirado.nmviajes.constants.AppConstants;
 import com.ptirado.nmviajes.constants.MessageKeys;
+import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 import com.ptirado.nmviajes.dto.api.request.ReservaRequest;
 import com.ptirado.nmviajes.dto.api.request.ServicioAdicionalItemRequest;
 import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
@@ -150,9 +150,7 @@ public class ReservaServiceImpl implements ReservaService {
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
         reserva.setTotalPagar(subtotalItem);
-        reserva.setEstadoReserva("PENDIENTE");
-        reserva.setEstado(AppConstants.STATUS_ACTIVO);
-        reserva.setFechaCreacion(LocalDateTime.now());
+        reserva.setEstadoReserva(EstadoReserva.PENDIENTE);
 
         // 5. Crear el item de la reserva
         ReservaItem reservaItem = new ReservaItem();
@@ -160,7 +158,6 @@ public class ReservaServiceImpl implements ReservaService {
         reservaItem.setPaquete(paquete);
         reservaItem.setFechaViajeInicio(request.getFechaViajeInicio());
         reservaItem.setSubtotal(subtotalItem);
-        reservaItem.setFechaCreacion(LocalDateTime.now());
 
         // 6. Crear los servicios del item
         List<ReservaItemServicio> servicios = crearServiciosItem(reservaItem, request.getServiciosAdicionales());
@@ -233,9 +230,7 @@ public class ReservaServiceImpl implements ReservaService {
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
         reserva.setTotalPagar(subtotalItem);
-        reserva.setEstadoReserva("PENDIENTE");
-        reserva.setEstado(AppConstants.STATUS_ACTIVO);
-        reserva.setFechaCreacion(LocalDateTime.now());
+        reserva.setEstadoReserva(EstadoReserva.PENDIENTE);
 
         // 6. Crear el item de la reserva
         ReservaItem reservaItem = new ReservaItem();
@@ -243,7 +238,6 @@ public class ReservaServiceImpl implements ReservaService {
         reservaItem.setPaquete(paquete);
         reservaItem.setFechaViajeInicio(form.getFechaViajeInicio());
         reservaItem.setSubtotal(subtotalItem);
-        reservaItem.setFechaCreacion(LocalDateTime.now());
 
         // 7. Crear los servicios del item
         List<ReservaItemServicio> servicios = crearServiciosItem(reservaItem, serviciosRequest);
@@ -267,5 +261,51 @@ public class ReservaServiceImpl implements ReservaService {
         getUsuarioOrThrow(idUsuario);
         List<Reserva> reservas = reservaRepository.findByUsuario_IdUsuario(idUsuario);
         return reservaMapper.toViewList(reservas);
+    }
+
+    // ===========================================================
+    // PAGO / FINALIZACIÓN
+    // ===========================================================
+
+    @Override
+    public ReservaResponse confirmarPago(Integer idReserva) {
+        Reserva reserva = getReservaOrThrow(idReserva);
+
+        if (reserva.estaFinalizada()) {
+            throw new BadRequestException(MessageKeys.RESERVA_YA_PAGADA, idReserva);
+        }
+
+        if (reserva.getEstadoReserva() == EstadoReserva.CANCELADA) {
+            throw new BadRequestException(MessageKeys.RESERVA_CANCELADA, idReserva);
+        }
+
+        reserva.confirmarPago();
+        Reserva reservaActualizada = reservaRepository.save(reserva);
+
+        return reservaMapper.toResponseFromEntity(reservaActualizada);
+    }
+
+    @Override
+    public ReservaResponse cancelarReserva(Integer idReserva) {
+        Reserva reserva = getReservaOrThrow(idReserva);
+
+        if (reserva.estaFinalizada()) {
+            throw new BadRequestException(MessageKeys.RESERVA_YA_PAGADA, idReserva);
+        }
+
+        reserva.setEstadoReserva(EstadoReserva.CANCELADA);
+        Reserva reservaActualizada = reservaRepository.save(reserva);
+
+        return reservaMapper.toResponseFromEntity(reservaActualizada);
+    }
+
+    @Override
+    public void pagarParaWeb(Integer idReserva) {
+        confirmarPago(idReserva);
+    }
+
+    @Override
+    public void cancelarParaWeb(Integer idReserva) {
+        cancelarReserva(idReserva);
     }
 }

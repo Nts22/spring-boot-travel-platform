@@ -21,7 +21,7 @@ public class ReservaResponse {
     private Integer idReserva;
     private BigDecimal totalPagar;
     private String estadoReserva;
-    private String estado;
+    private boolean finalizada;
     private LocalDateTime fechaCreacion;
 
     // Datos del usuario
