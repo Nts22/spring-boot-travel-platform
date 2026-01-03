@@ -10,8 +10,10 @@ import lombok.Setter;
 public class ReservaView {
     private Integer idReserva;
     private String totalPagarFormateado;
-    private String estadoReserva;
-    private String estado;
+    private String estadoReserva;        // Texto formateado para mostrar
+    private String estadoReservaCode;    // Codigo del enum (PENDIENTE, PAGADA, CANCELADA)
+    private boolean finalizada;
+    private boolean cancelada;
     private String fechaCreacionFormateada;
 
     // Datos del usuario

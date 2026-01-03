@@ -14,6 +14,7 @@ import com.ptirado.nmviajes.dto.api.response.ReservaItemResponse;
 import com.ptirado.nmviajes.dto.api.response.ReservaItemServicioResponse;
 import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
 import com.ptirado.nmviajes.entity.Reserva;
+import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 import com.ptirado.nmviajes.entity.ReservaItem;
 import com.ptirado.nmviajes.entity.ReservaItemServicio;
 import com.ptirado.nmviajes.viewmodel.ReservaItemServicioView;
@@ -49,6 +50,15 @@ public class ReservaMapper {
         return precio != null ? "S/ " + PRICE_FORMATTER.format(precio) : "S/ 0.00";
     }
 
+    private String formatearEstado(EstadoReserva estado) {
+        if (estado == null) return "Desconocido";
+        return switch (estado) {
+            case PENDIENTE -> "Pendiente de Pago";
+            case PAGADA -> "Pagada (Finalizada)";
+            case CANCELADA -> "Cancelada";
+        };
+    }
+
     // ===========================================================
     //               MAPEOS PARA API (JSON)
     // ===========================================================
@@ -59,8 +69,8 @@ public class ReservaMapper {
         return ReservaResponse.builder()
                 .idReserva(reserva.getIdReserva())
                 .totalPagar(reserva.getTotalPagar())
-                .estadoReserva(reserva.getEstadoReserva())
-                .estado(reserva.getEstado())
+                .estadoReserva(reserva.getEstadoReserva() != null ? reserva.getEstadoReserva().name() : null)
+                .finalizada(reserva.estaFinalizada())
                 .fechaCreacion(reserva.getFechaCreacion())
                 // Usuario
                 .idUsuario(reserva.getUsuario() != null ? reserva.getUsuario().getIdUsuario() : null)
@@ -140,8 +150,10 @@ public class ReservaMapper {
         ReservaView view = new ReservaView();
         view.setIdReserva(reserva.getIdReserva());
         view.setTotalPagarFormateado(formatearPrecio(reserva.getTotalPagar()));
-        view.setEstadoReserva(reserva.getEstadoReserva());
-        view.setEstado(reserva.getEstado());
+        view.setEstadoReserva(formatearEstado(reserva.getEstadoReserva()));
+        view.setEstadoReservaCode(reserva.getEstadoReserva() != null ? reserva.getEstadoReserva().name() : null);
+        view.setFinalizada(reserva.estaFinalizada());
+        view.setCancelada(reserva.getEstadoReserva() == EstadoReserva.CANCELADA);
         view.setFechaCreacionFormateada(formatearFechaHora(reserva.getFechaCreacion()));
 
         // Usuario

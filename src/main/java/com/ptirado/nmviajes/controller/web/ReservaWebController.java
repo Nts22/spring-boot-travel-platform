@@ -103,4 +103,26 @@ public class ReservaWebController {
         model.addAttribute("content", "reserva/list");
         return "layout/main";
     }
+
+    @PostMapping("/{id}/pagar")
+    public String pagar(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            reservaService.pagarParaWeb(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Pago realizado exitosamente. Su reserva ha sido confirmada.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/reservas/" + id;
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public String cancelar(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            reservaService.cancelarParaWeb(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Reserva cancelada exitosamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/reservas/" + id;
+    }
 }

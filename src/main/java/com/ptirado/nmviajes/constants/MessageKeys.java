@@ -77,6 +77,8 @@ public final class MessageKeys {
     public static final String RESERVA_NOT_FOUND = "reserva.notfound";
     public static final String RESERVA_CREATED = "reserva.created";
     public static final String RESERVA_INVALID = "reserva.invalid";
+    public static final String RESERVA_YA_PAGADA = "reserva.ya.pagada";
+    public static final String RESERVA_CANCELADA = "reserva.cancelada";
     public static final String STOCK_INSUFICIENTE = "stock.insuficiente";
 
     // ============================================================

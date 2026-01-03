@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ptirado.nmviajes.constants.AppConstants;
 import com.ptirado.nmviajes.constants.MessageKeys;
+import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 import com.ptirado.nmviajes.dto.api.request.CarritoItemRequest;
 import com.ptirado.nmviajes.dto.api.request.ServicioAdicionalItemRequest;
 import com.ptirado.nmviajes.dto.api.response.CarritoResponse;
@@ -229,9 +229,7 @@ public class CarritoServiceImpl implements CarritoService {
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
         reserva.setTotalPagar(totalReserva);
-        reserva.setEstadoReserva("PENDIENTE");
-        reserva.setEstado(AppConstants.STATUS_ACTIVO);
-        reserva.setFechaCreacion(LocalDateTime.now());
+        reserva.setEstadoReserva(EstadoReserva.PENDIENTE);
 
         List<ReservaItem> reservaItems = new ArrayList<>();
 

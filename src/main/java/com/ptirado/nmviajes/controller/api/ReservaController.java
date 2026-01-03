@@ -46,4 +46,14 @@ public class ReservaController {
     public ResponseEntity<List<ReservaResponse>> listarPorUsuario(@PathVariable Integer idUsuario) {
         return ResponseEntity.ok(reservaService.listarPorUsuarioParaApi(idUsuario));
     }
+
+    @PostMapping("/{id}/pagar")
+    public ResponseEntity<ReservaResponse> confirmarPago(@PathVariable Integer id) {
+        return ResponseEntity.ok(reservaService.confirmarPago(id));
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<ReservaResponse> cancelar(@PathVariable Integer id) {
+        return ResponseEntity.ok(reservaService.cancelarReserva(id));
+    }
 }

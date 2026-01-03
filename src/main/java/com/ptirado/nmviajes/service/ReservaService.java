@@ -32,4 +32,16 @@ public interface ReservaService {
     void crearDesdeForm(ReservaForm form);
 
     List<ReservaView> listarPorUsuarioParaWeb(Integer idUsuario);
+
+    // ===========================================================
+    // PAGO / FINALIZACIÓN
+    // ===========================================================
+
+    ReservaResponse confirmarPago(Integer idReserva);
+
+    ReservaResponse cancelarReserva(Integer idReserva);
+
+    void pagarParaWeb(Integer idReserva);
+
+    void cancelarParaWeb(Integer idReserva);
 }
