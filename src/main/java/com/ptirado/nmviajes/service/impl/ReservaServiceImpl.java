@@ -16,8 +16,9 @@ import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
 import com.ptirado.nmviajes.dto.form.ReservaForm;
 import com.ptirado.nmviajes.entity.Paquete;
 import com.ptirado.nmviajes.entity.Reserva;
-import com.ptirado.nmviajes.entity.ReservaServicio;
-import com.ptirado.nmviajes.entity.ReservaServicioId;
+import com.ptirado.nmviajes.entity.ReservaItem;
+import com.ptirado.nmviajes.entity.ReservaItemServicio;
+import com.ptirado.nmviajes.entity.ReservaItemServicioId;
 import com.ptirado.nmviajes.entity.ServicioAdicional;
 import com.ptirado.nmviajes.entity.Usuario;
 import com.ptirado.nmviajes.exception.api.BadRequestException;
@@ -25,7 +26,6 @@ import com.ptirado.nmviajes.exception.api.NotFoundException;
 import com.ptirado.nmviajes.mapper.ReservaMapper;
 import com.ptirado.nmviajes.repository.PaqueteRepository;
 import com.ptirado.nmviajes.repository.ReservaRepository;
-import com.ptirado.nmviajes.repository.ReservaServicioRepository;
 import com.ptirado.nmviajes.repository.ServicioAdicionalRepository;
 import com.ptirado.nmviajes.repository.UsuarioRepository;
 import com.ptirado.nmviajes.service.ReservaService;
@@ -39,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class ReservaServiceImpl implements ReservaService {
 
     private final ReservaRepository reservaRepository;
-    private final ReservaServicioRepository reservaServicioRepository;
     private final PaqueteRepository paqueteRepository;
     private final UsuarioRepository usuarioRepository;
     private final ServicioAdicionalRepository servicioAdicionalRepository;
@@ -80,7 +79,7 @@ public class ReservaServiceImpl implements ReservaService {
         paqueteRepository.save(paquete);
     }
 
-    private BigDecimal calcularTotalPagar(Paquete paquete,
+    private BigDecimal calcularSubtotalItem(Paquete paquete,
             List<ServicioAdicionalItemRequest> serviciosRequest) {
 
         BigDecimal total = paquete.getPrecio();
@@ -97,26 +96,26 @@ public class ReservaServiceImpl implements ReservaService {
         return total;
     }
 
-    private List<ReservaServicio> crearReservasServicios(Reserva reserva,
+    private List<ReservaItemServicio> crearServiciosItem(ReservaItem reservaItem,
             List<ServicioAdicionalItemRequest> serviciosRequest) {
 
-        List<ReservaServicio> reservasServicios = new ArrayList<>();
+        List<ReservaItemServicio> servicios = new ArrayList<>();
 
         if (serviciosRequest != null && !serviciosRequest.isEmpty()) {
             for (ServicioAdicionalItemRequest item : serviciosRequest) {
                 ServicioAdicional servicio = getServicioOrThrow(item.getIdServicio());
 
-                ReservaServicio rs = new ReservaServicio();
-                rs.setId(new ReservaServicioId(reserva.getIdReserva(), servicio.getIdServicio()));
-                rs.setReserva(reserva);
-                rs.setServicioAdicional(servicio);
-                rs.setCantidad(item.getCantidad());
+                ReservaItemServicio ris = new ReservaItemServicio();
+                ris.setId(new ReservaItemServicioId(null, servicio.getIdServicio()));
+                ris.setReservaItem(reservaItem);
+                ris.setServicioAdicional(servicio);
+                ris.setCantidad(item.getCantidad());
 
-                reservasServicios.add(reservaServicioRepository.save(rs));
+                servicios.add(ris);
             }
         }
 
-        return reservasServicios;
+        return servicios;
     }
 
     // ===========================================================
@@ -144,27 +143,38 @@ public class ReservaServiceImpl implements ReservaService {
         // 2. Validar stock disponible
         validarStockDisponible(paquete);
 
-        // 3. Calcular total a pagar
-        BigDecimal totalPagar = calcularTotalPagar(paquete, request.getServiciosAdicionales());
+        // 3. Calcular subtotal del item
+        BigDecimal subtotalItem = calcularSubtotalItem(paquete, request.getServiciosAdicionales());
 
         // 4. Crear la reserva
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
-        reserva.setPaquete(paquete);
-        reserva.setFechaViajeInicio(request.getFechaViajeInicio());
-        reserva.setTotalPagar(totalPagar);
+        reserva.setTotalPagar(subtotalItem);
         reserva.setEstadoReserva("PENDIENTE");
         reserva.setEstado(AppConstants.STATUS_ACTIVO);
         reserva.setFechaCreacion(LocalDateTime.now());
 
+        // 5. Crear el item de la reserva
+        ReservaItem reservaItem = new ReservaItem();
+        reservaItem.setReserva(reserva);
+        reservaItem.setPaquete(paquete);
+        reservaItem.setFechaViajeInicio(request.getFechaViajeInicio());
+        reservaItem.setSubtotal(subtotalItem);
+        reservaItem.setFechaCreacion(LocalDateTime.now());
+
+        // 6. Crear los servicios del item
+        List<ReservaItemServicio> servicios = crearServiciosItem(reservaItem, request.getServiciosAdicionales());
+        reservaItem.setServicios(servicios);
+
+        // 7. Agregar item a la reserva
+        List<ReservaItem> items = new ArrayList<>();
+        items.add(reservaItem);
+        reserva.setItems(items);
+
+        // 8. Guardar la reserva
         Reserva reservaGuardada = reservaRepository.save(reserva);
 
-        // 5. Crear los servicios adicionales de la reserva
-        List<ReservaServicio> servicios = crearReservasServicios(
-            reservaGuardada, request.getServiciosAdicionales());
-        reservaGuardada.setReservasServicios(servicios);
-
-        // 6. Decrementar stock del paquete
+        // 9. Decrementar stock del paquete
         decrementarStock(paquete);
 
         return reservaMapper.toResponseFromEntity(reservaGuardada);
@@ -216,25 +226,38 @@ public class ReservaServiceImpl implements ReservaService {
             }
         }
 
-        // 4. Calcular total a pagar
-        BigDecimal totalPagar = calcularTotalPagar(paquete, serviciosRequest);
+        // 4. Calcular subtotal del item
+        BigDecimal subtotalItem = calcularSubtotalItem(paquete, serviciosRequest);
 
         // 5. Crear la reserva
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
-        reserva.setPaquete(paquete);
-        reserva.setFechaViajeInicio(form.getFechaViajeInicio());
-        reserva.setTotalPagar(totalPagar);
+        reserva.setTotalPagar(subtotalItem);
         reserva.setEstadoReserva("PENDIENTE");
         reserva.setEstado(AppConstants.STATUS_ACTIVO);
         reserva.setFechaCreacion(LocalDateTime.now());
 
-        Reserva reservaGuardada = reservaRepository.save(reserva);
+        // 6. Crear el item de la reserva
+        ReservaItem reservaItem = new ReservaItem();
+        reservaItem.setReserva(reserva);
+        reservaItem.setPaquete(paquete);
+        reservaItem.setFechaViajeInicio(form.getFechaViajeInicio());
+        reservaItem.setSubtotal(subtotalItem);
+        reservaItem.setFechaCreacion(LocalDateTime.now());
 
-        // 6. Crear los servicios adicionales de la reserva
-        crearReservasServicios(reservaGuardada, serviciosRequest);
+        // 7. Crear los servicios del item
+        List<ReservaItemServicio> servicios = crearServiciosItem(reservaItem, serviciosRequest);
+        reservaItem.setServicios(servicios);
 
-        // 7. Decrementar stock del paquete
+        // 8. Agregar item a la reserva
+        List<ReservaItem> items = new ArrayList<>();
+        items.add(reservaItem);
+        reserva.setItems(items);
+
+        // 9. Guardar la reserva
+        reservaRepository.save(reserva);
+
+        // 10. Decrementar stock del paquete
         decrementarStock(paquete);
     }
 

@@ -43,5 +43,5 @@ public class ServicioAdicional {
     private String estado;
 
     @OneToMany(mappedBy = "servicioAdicional", fetch = FetchType.LAZY)
-    private List<ReservaServicio> reservasServicios = new ArrayList<>();
+    private List<ReservaItemServicio> reservaItemServicios = new ArrayList<>();
 }

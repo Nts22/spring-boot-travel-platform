@@ -14,12 +14,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     List<Reserva> findByUsuario_IdUsuario(Integer idUsuario);
 
-    List<Reserva> findByPaquete_IdPaquete(Integer idPaquete);
-
     List<Reserva> findByEstadoReserva(String estadoReserva);
 
     List<Reserva> findByUsuario_IdUsuarioAndEstado(Integer idUsuario, String estado);
 
-    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.paquete.idPaquete = :idPaquete AND r.estado = :estado")
+    @Query("SELECT DISTINCT r FROM Reserva r JOIN r.items i WHERE i.paquete.idPaquete = :idPaquete")
+    List<Reserva> findByPaqueteId(@Param("idPaquete") Integer idPaquete);
+
+    @Query("SELECT COUNT(DISTINCT r) FROM Reserva r JOIN r.items i WHERE i.paquete.idPaquete = :idPaquete AND r.estado = :estado")
     Long countByPaqueteAndEstado(@Param("idPaquete") Integer idPaquete, @Param("estado") String estado);
 }

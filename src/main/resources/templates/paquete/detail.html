@@ -68,15 +68,22 @@
             </div>
 
             <!-- Botones -->
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
+                <!-- Boton Agregar al Carrito -->
                 <a th:if="${paquete.stockDisponible != null and paquete.stockDisponible != '0'}"
-                   th:href="@{/reservas/nueva/{id}(id=${paquete.idPaquete})}"
-                   class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition inline-block text-center">
-                    Reservar ahora
+                   th:href="@{/carrito/agregar/{id}(id=${paquete.idPaquete})}"
+                   class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition inline-flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Agregar al carrito
                 </a>
                 <span th:if="${paquete.stockDisponible == null or paquete.stockDisponible == '0'}"
-                      class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed inline-block text-center">
-                    Reservar ahora
+                      class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed inline-flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Agregar al carrito
                 </span>
                 <a th:href="@{/paquetes}"
                    class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition">

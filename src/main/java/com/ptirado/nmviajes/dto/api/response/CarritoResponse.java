@@ -1,6 +1,7 @@
 package com.ptirado.nmviajes.dto.api.response;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -14,11 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReservaServicioResponse {
+public class CarritoResponse {
 
-    private Integer idServicio;
-    private String nombreServicio;
-    private BigDecimal costoUnitario;
-    private Integer cantidad;
-    private BigDecimal subtotal;
+    private Integer idCarrito;
+    private Integer idUsuario;
+    private Integer cantidadItems;
+    private BigDecimal totalCarrito;
+    private List<CarritoItemResponse> items;
 }

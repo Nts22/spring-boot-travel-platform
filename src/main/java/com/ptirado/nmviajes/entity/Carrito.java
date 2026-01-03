@@ -1,6 +1,5 @@
 package com.ptirado.nmviajes.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -23,33 +22,28 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "reserva")
+@Table(name = "carrito")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Reserva {
+public class Carrito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
     @EqualsAndHashCode.Include
-    private Integer idReserva;
+    private Integer idCarrito;
 
-    @ToString.Include
-    private BigDecimal totalPagar;
-
-    private String estadoReserva;
-    private String estado;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaModificacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "reserva", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReservaItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "carrito", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarritoItem> items = new ArrayList<>();
 
     @ToString.Include(name = "usuarioId")
     public Integer getUsuarioId() {

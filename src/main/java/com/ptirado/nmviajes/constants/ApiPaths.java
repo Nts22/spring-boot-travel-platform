@@ -28,4 +28,12 @@ public final class ApiPaths {
     // SERVICIOS ADICIONALES
     public static final String SERVICIOS = API_BASE + "/servicios";
     public static final String SERVICIOS_ID = "/{id}";
+
+    // CARRITO
+    public static final String CARRITO = API_BASE + "/carrito";
+    public static final String CARRITO_ITEMS = "/items";
+    public static final String CARRITO_ITEM_ID = "/items/{idItem}";
+    public static final String CARRITO_VACIAR = "/vaciar";
+    public static final String CARRITO_CHECKOUT = "/checkout";
+    public static final String CARRITO_CONTAR = "/contar";
 }

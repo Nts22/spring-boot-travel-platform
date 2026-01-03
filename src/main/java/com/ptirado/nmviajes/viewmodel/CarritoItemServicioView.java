@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReservaServicioView {
+public class CarritoItemServicioView {
     private Integer idServicio;
     private String nombreServicio;
     private String costoUnitarioFormateado;

@@ -18,11 +18,20 @@
     <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-red-600">Plataforma de Viajes</h1>
 
-        <ul class="flex gap-6 text-sm font-medium">
+        <ul class="flex gap-6 text-sm font-medium items-center">
             <li><a th:href="@{/}" class="hover:text-red-600">Inicio</a></li>
             <li><a th:href="@{/paquetes}" class="hover:text-red-600">Paquetes</a></li>
             <li><a href="#" class="hover:text-red-600">Ofertas</a></li>
             <li><a href="#" data-modal-target="contact-modal" data-modal-toggle="contact-modal" class="hover:text-red-600 cursor-pointer">Contacto</a></li>
+            <li><a th:href="@{/reservas}" class="hover:text-red-600">Mis Reservas</a></li>
+            <li>
+                <a th:href="@{/carrito}" class="relative hover:text-red-600 flex items-center gap-1" title="Mi Carrito">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span id="carrito-contador" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
@@ -115,5 +124,35 @@
 <script th:src="@{/js/core/toast.js}"></script>
 <script th:src="@{/js/core/form-handler.js}"></script>
 <script th:src="@{/js/modules/contacto-form.js}"></script>
+
+<!-- Script para el contador del carrito -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar contador del carrito al cargar la pagina
+    actualizarContadorCarrito();
+});
+
+function actualizarContadorCarrito() {
+    // Usuario por defecto (en produccion vendria de la sesion)
+    const idUsuario = 1;
+
+    fetch('/api/v1/carrito/contar?idUsuario=' + idUsuario)
+        .then(response => response.json())
+        .then(cantidad => {
+            const contador = document.getElementById('carrito-contador');
+            if (contador) {
+                if (cantidad > 0) {
+                    contador.textContent = cantidad > 9 ? '9+' : cantidad;
+                    contador.classList.remove('hidden');
+                } else {
+                    contador.classList.add('hidden');
+                }
+            }
+        })
+        .catch(error => {
+            console.log('Error al obtener contador del carrito:', error);
+        });
+}
+</script>
 </body>
 </html>
