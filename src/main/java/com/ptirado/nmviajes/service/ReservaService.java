@@ -2,6 +2,9 @@ package com.ptirado.nmviajes.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.ptirado.nmviajes.dto.api.request.ReservaRequest;
 import com.ptirado.nmviajes.dto.api.response.ReservaResponse;
 import com.ptirado.nmviajes.dto.form.ReservaForm;
@@ -81,6 +84,14 @@ public interface ReservaService {
      * @return Lista de reservas en formato ViewModel (con datos formateados)
      */
     List<ReservaView> listarParaWeb();
+
+    /**
+     * Lista todas las reservas de forma paginada para la vista web.
+     *
+     * @param pageable Configuracion de paginacion
+     * @return Pagina de reservas en formato ViewModel
+     */
+    Page<ReservaView> listarParaWebPaginado(Pageable pageable);
 
     /**
      * Obtiene una reserva por su ID para mostrar en la vista web.

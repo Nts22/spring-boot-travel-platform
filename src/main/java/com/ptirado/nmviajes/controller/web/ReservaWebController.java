@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptirado.nmviajes.dto.form.ReservaForm;
@@ -64,16 +68,23 @@ public class ReservaWebController {
     // ║                           VISTAS DE CONSULTA                               ║
     // ╚═══════════════════════════════════════════════════════════════════════════╝
 
+    private static final int PAGE_SIZE = 10;
+
     /**
-     * Muestra la lista de todas las reservas.
+     * Muestra la lista de todas las reservas con paginacion.
      *
+     * @param page Numero de pagina (0-indexed)
      * @param model Modelo para la vista
      * @return Vista de lista de reservas
      */
     @GetMapping
-    public String listar(Model model) {
-        List<ReservaView> reservas = reservaService.listarParaWeb();
-        model.addAttribute("reservas", reservas);
+    public String listar(@RequestParam(defaultValue = "0") int page, Model model) {
+        Page<ReservaView> reservasPage = reservaService.listarParaWebPaginado(
+                PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "idReserva")));
+        model.addAttribute("reservas", reservasPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", reservasPage.getTotalPages());
+        model.addAttribute("totalItems", reservasPage.getTotalElements());
         model.addAttribute("title", "Mis Reservas");
         model.addAttribute("content", "reserva/list");
         return "layout/main";

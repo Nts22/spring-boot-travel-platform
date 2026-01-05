@@ -71,7 +71,8 @@ CONTROLADOR: ReservaWebController.listar()
          - Estado: Badge con color segun estado
          - Acciones: Link al detalle
     ═══════════════════════════════════════════════════════════════════════ -->
-    <div th:if="${!#lists.isEmpty(reservas)}" class="overflow-x-auto">
+    <div th:if="${!#lists.isEmpty(reservas)}" class="relative" style="min-height: 650px; padding-bottom: 60px;">
+        <div class="overflow-x-auto">
         <table class="min-w-full bg-white rounded-lg shadow">
 
             <!-- Cabecera de la tabla -->
@@ -136,6 +137,67 @@ CONTROLADOR: ReservaWebController.listar()
                 </tr>
             </tbody>
         </table>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             PAGINACION
+             Controles para navegar entre paginas de resultados
+             Siempre visible para mantener altura consistente
+        ═══════════════════════════════════════════════════════════════════════ -->
+        <div class="absolute bottom-0 left-0 right-0 flex items-center justify-between" style="height: 40px;">
+            <th:block th:if="${totalPages > 1}">
+                <!-- Info de resultados -->
+                <p class="text-sm text-gray-600">
+                    Mostrando pagina <span th:text="${currentPage + 1}">1</span>
+                    de <span th:text="${totalPages}">1</span>
+                    (<span th:text="${totalItems}">0</span> reservas en total)
+                </p>
+
+                <!-- Controles de navegacion -->
+                <nav class="flex gap-2">
+                    <!-- Boton: Primera pagina -->
+                    <a th:href="@{/reservas(page=0)}"
+                       th:class="${currentPage == 0 ? 'pointer-events-none opacity-50' : ''}"
+                       class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Primera
+                    </a>
+
+                    <!-- Boton: Pagina anterior -->
+                    <a th:href="@{/reservas(page=${currentPage - 1})}"
+                       th:class="${currentPage == 0 ? 'pointer-events-none opacity-50' : ''}"
+                       class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Anterior
+                    </a>
+
+                    <!-- Numeros de pagina (muestra hasta 5 paginas) -->
+                    <th:block th:each="i : ${#numbers.sequence(
+                        T(java.lang.Math).max(0, currentPage - 2),
+                        T(java.lang.Math).min(totalPages - 1, currentPage + 2)
+                    )}">
+                        <a th:href="@{/reservas(page=${i})}"
+                           th:text="${i + 1}"
+                           th:class="${i == currentPage
+                               ? 'bg-red-600 text-white border-red-600'
+                               : 'border-gray-300 hover:bg-gray-50'}"
+                           class="px-3 py-2 text-sm border rounded-lg transition">1</a>
+                    </th:block>
+
+                    <!-- Boton: Pagina siguiente -->
+                    <a th:href="@{/reservas(page=${currentPage + 1})}"
+                       th:class="${currentPage >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}"
+                       class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Siguiente
+                    </a>
+
+                    <!-- Boton: Ultima pagina -->
+                    <a th:href="@{/reservas(page=${totalPages - 1})}"
+                       th:class="${currentPage >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}"
+                       class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Ultima
+                    </a>
+                </nav>
+            </th:block>
+        </div>
     </div>
 
 </section>
