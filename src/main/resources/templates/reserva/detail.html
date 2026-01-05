@@ -1,6 +1,39 @@
+<!--
+================================================================================
+DETALLE DE RESERVA - detail.html
+================================================================================
+Vista que muestra el detalle completo de una reserva individual.
+
+MODELO ESPERADO (ReservaView):
+- idReserva: Integer - ID unico de la reserva
+- totalPagarFormateado: String - Total con formato "S/ 1,500.00"
+- estadoReserva: String - Texto para mostrar ("Pendiente de Pago", "Pagada", etc.)
+- estadoReservaCode: String - Codigo enum ("PENDIENTE", "PAGADA", "CANCELADA")
+- finalizada: boolean - true si la reserva ya fue pagada
+- cancelada: boolean - true si la reserva fue cancelada
+- fechaCreacionFormateada: String - Fecha con formato "dd/MM/yyyy HH:mm"
+- items: List<ReservaItemView> - Items de la reserva
+
+Cada ReservaItemView contiene:
+- nombrePaquete, nombreDestino, fechaViajeInicioFormateada
+- precioPaqueteFormateado, subtotalFormateado
+- serviciosAdicionales: List<ReservaItemServicioView>
+
+FLASH ATTRIBUTES (del controlador):
+- successMessage: Mensaje de operacion exitosa
+- errorMessage: Mensaje de error
+
+URL: /reservas/{id}
+CONTROLADOR: ReservaWebController.detalle()
+================================================================================
+-->
+
 <section class="max-w-4xl mx-auto px-6 py-10">
 
-    <!-- Breadcrumb -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVEGACION - Breadcrumb
+         Muestra la ruta de navegacion: Inicio > Mis Reservas > Reserva #X
+    ═══════════════════════════════════════════════════════════════════════ -->
     <nav class="mb-6 text-sm text-gray-500">
         <a th:href="@{/}" class="hover:text-red-600">Inicio</a>
         <span class="mx-2">/</span>
@@ -11,7 +44,10 @@
 
     <div class="bg-white rounded-lg shadow-lg p-8">
 
-        <!-- Cabecera -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             CABECERA - Titulo y Estado
+             Muestra el numero de reserva, fecha y badge de estado
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="flex justify-between items-start mb-6 pb-6 border-b">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">
@@ -21,6 +57,17 @@
                     Creada el <span th:text="${reserva.fechaCreacionFormateada}">01/01/2025</span>
                 </p>
             </div>
+
+            <!--
+            BADGE DE ESTADO
+            Usa estadoReservaCode para determinar el color (logica)
+            Usa estadoReserva para mostrar el texto (presentacion)
+
+            Colores segun estado:
+            - PENDIENTE: Amarillo (esperando pago)
+            - PAGADA: Verde (completada exitosamente)
+            - CANCELADA: Rojo (cancelada por usuario)
+            -->
             <span th:class="${reserva.estadoReservaCode == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' :
                              (reserva.estadoReservaCode == 'PAGADA' ? 'bg-green-100 text-green-800' :
                              (reserva.estadoReservaCode == 'CANCELADA' ? 'bg-red-100 text-red-800' :
@@ -28,11 +75,18 @@
                   th:text="${reserva.estadoReserva}">PENDIENTE</span>
         </div>
 
-        <!-- Items de la Reserva (Paquetes) -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             ITEMS DE LA RESERVA
+             Lista de paquetes turisticos incluidos en esta reserva.
+             Cada item puede tener servicios adicionales opcionales.
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-700 mb-3">Paquetes Reservados</h3>
 
+            <!-- Iteracion sobre cada item/paquete de la reserva -->
             <div th:each="item, iterStat : ${reserva.items}" class="bg-gray-50 rounded-lg p-4 mb-4">
+
+                <!-- Informacion principal del paquete -->
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <p class="text-xl font-bold text-gray-800" th:text="${item.nombrePaquete}">Nombre del Paquete</p>
@@ -40,11 +94,17 @@
                         <p class="text-gray-600">Fecha de viaje: <span th:text="${item.fechaViajeInicioFormateada}">01/01/2025</span></p>
                         <p class="text-gray-500 text-sm mt-1">Precio base: <span th:text="${item.precioPaqueteFormateado}">S/ 0.00</span></p>
                     </div>
+                    <!-- Subtotal del item (paquete + servicios adicionales) -->
                     <p class="text-red-600 font-bold text-lg" th:text="${item.subtotalFormateado}">S/ 0.00</p>
                 </div>
 
-                <!-- Servicios Adicionales del Item -->
-                <div th:if="${item.serviciosAdicionales != null and !#lists.isEmpty(item.serviciosAdicionales)}" class="mt-4 pt-4 border-t border-gray-200">
+                <!--
+                SERVICIOS ADICIONALES
+                Solo se muestra si el item tiene servicios adicionales contratados.
+                Incluye tabla con: nombre, precio unitario, cantidad y subtotal
+                -->
+                <div th:if="${item.serviciosAdicionales != null and !#lists.isEmpty(item.serviciosAdicionales)}"
+                     class="mt-4 pt-4 border-t border-gray-200">
                     <p class="text-sm font-medium text-gray-600 mb-2">Servicios adicionales:</p>
                     <table class="w-full text-sm">
                         <thead class="bg-gray-100">
@@ -68,7 +128,10 @@
             </div>
         </div>
 
-        <!-- Total -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             TOTAL A PAGAR
+             Suma de todos los items de la reserva
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="border-t pt-6">
             <div class="flex justify-between items-center">
                 <span class="text-xl font-bold text-gray-800">Total a Pagar:</span>
@@ -76,31 +139,67 @@
             </div>
         </div>
 
-        <!-- Mensajes de alerta -->
-        <div th:if="${successMessage}" class="mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <!-- ═══════════════════════════════════════════════════════════════════
+             MENSAJES DE FEEDBACK
+             Flash messages del controlador despues de operaciones (pagar/cancelar)
+             - successMessage: Operacion exitosa (verde)
+             - errorMessage: Error en operacion (rojo)
+        ═══════════════════════════════════════════════════════════════════ -->
+        <div th:if="${successMessage}"
+             class="mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
             <span th:text="${successMessage}">Mensaje de exito</span>
         </div>
-        <div th:if="${errorMessage}" class="mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div th:if="${errorMessage}"
+             class="mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             <span th:text="${errorMessage}">Mensaje de error</span>
         </div>
 
-        <!-- Botones -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             BOTONES DE ACCION
+
+             Logica de visibilidad:
+             - "Volver": Siempre visible
+             - "Pagar": Solo si !finalizada AND !cancelada (estado PENDIENTE)
+             - "Cancelar": Solo si !finalizada AND !cancelada (estado PENDIENTE)
+
+             IMPORTANTE: Usamos las propiedades booleanas (finalizada, cancelada)
+             en lugar de comparar strings para evitar errores de comparacion.
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="mt-8 flex gap-4">
+
+            <!-- Boton: Volver a lista (siempre visible) -->
             <a th:href="@{/reservas}"
                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition">
                 Volver a Mis Reservas
             </a>
 
-            <!-- Boton Pagar (solo si no esta finalizada ni cancelada) -->
-            <form th:if="${!reserva.finalizada and !reserva.cancelada}" th:action="@{/reservas/{id}/pagar(id=${reserva.idReserva})}" method="post" class="inline">
+            <!--
+            Boton: PAGAR RESERVA
+            - Visible solo si: !finalizada AND !cancelada
+            - Envia POST a /reservas/{id}/pagar
+            - Cambia estado de PENDIENTE a PAGADA
+            -->
+            <form th:if="${!reserva.finalizada and !reserva.cancelada}"
+                  th:action="@{/reservas/{id}/pagar(id=${reserva.idReserva})}"
+                  method="post"
+                  class="inline">
                 <button type="submit"
                         class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium">
                     Pagar Reserva
                 </button>
             </form>
 
-            <!-- Boton Cancelar (solo si no esta finalizada ni cancelada) -->
-            <form th:if="${!reserva.finalizada and !reserva.cancelada}" th:action="@{/reservas/{id}/cancelar(id=${reserva.idReserva})}" method="post" class="inline">
+            <!--
+            Boton: CANCELAR RESERVA
+            - Visible solo si: !finalizada AND !cancelada
+            - Requiere confirmacion del usuario (onclick confirm)
+            - Envia POST a /reservas/{id}/cancelar
+            - Cambia estado de PENDIENTE a CANCELADA
+            -->
+            <form th:if="${!reserva.finalizada and !reserva.cancelada}"
+                  th:action="@{/reservas/{id}/cancelar(id=${reserva.idReserva})}"
+                  method="post"
+                  class="inline">
                 <button type="submit"
                         onclick="return confirm('Esta seguro que desea cancelar esta reserva?')"
                         class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-medium">

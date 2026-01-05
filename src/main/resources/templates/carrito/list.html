@@ -1,14 +1,50 @@
+<!--
+================================================================================
+CARRITO DE COMPRAS - carrito/list.html
+================================================================================
+Vista que muestra el carrito de compras del usuario con todos sus items.
+
+MODELO ESPERADO (CarritoView):
+- cantidadItems: Integer - Numero total de items
+- totalCarritoFormateado: String - Total formateado "S/ 1,500.00"
+- items: List<CarritoItemView> - Items del carrito
+
+Cada CarritoItemView contiene:
+- idItem: Integer
+- nombrePaquete, nombreDestino: String
+- fechaViajeInicioFormateada: String
+- fechaInicioPaquete, fechaFinPaquete: String
+- subtotalFormateado: String
+- serviciosAdicionales: List<ServicioAdicionalItemView>
+
+FLASH ATTRIBUTES:
+- successMessage: Mensaje de operacion exitosa
+- errorMessage: Mensaje de error
+
+URL: /carrito
+CONTROLADOR: CarritoWebController.verCarrito()
+
+ACCIONES DISPONIBLES:
+- Eliminar item: POST /carrito/eliminar/{idItem}
+- Confirmar reservas: POST /carrito/checkout
+- Vaciar carrito: POST /carrito/vaciar
+================================================================================
+-->
 
 <section class="max-w-7xl mx-auto px-6 py-10">
 
-    <!-- Breadcrumb -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVEGACION - Breadcrumb
+    ═══════════════════════════════════════════════════════════════════════ -->
     <nav class="mb-6 text-sm text-gray-500">
         <a th:href="@{/}" class="hover:text-red-600">Inicio</a>
         <span class="mx-2">/</span>
         <span class="text-gray-700">Mi Carrito</span>
     </nav>
 
-    <!-- Titulo -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         CABECERA - Titulo y contador de items
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div class="flex items-center justify-between mb-8">
         <h2 class="text-3xl font-bold">Mi Carrito de Compras</h2>
         <span th:if="${carrito.cantidadItems > 0}" class="text-gray-500">
@@ -16,7 +52,9 @@
         </span>
     </div>
 
-    <!-- Mensajes Flash -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         MENSAJES DE FEEDBACK (Flash messages)
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${successMessage}" class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
         <span th:text="${successMessage}"></span>
     </div>
@@ -24,7 +62,9 @@
         <span th:text="${errorMessage}"></span>
     </div>
 
-    <!-- Carrito vacio -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ESTADO VACIO - Cuando el carrito no tiene items
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${carrito.items == null or carrito.items.isEmpty()}" class="text-center py-16">
         <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -36,13 +76,22 @@
         </a>
     </div>
 
-    <!-- Lista de items -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         CONTENIDO DEL CARRITO - Grid de 3 columnas
+         Columnas 1-2: Lista de items
+         Columna 3: Resumen del pedido
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${carrito.items != null and !carrito.items.isEmpty()}" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Items del carrito (2 columnas) -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             COLUMNA IZQUIERDA (2/3): Lista de items del carrito
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="lg:col-span-2 space-y-4">
+
+            <!-- Iteracion sobre cada item del carrito -->
             <div th:each="item : ${carrito.items}" class="bg-white rounded-lg shadow-md p-6 border">
                 <div class="flex flex-col md:flex-row gap-4">
+
                     <!-- Imagen del paquete -->
                     <div class="md:w-1/4">
                         <img th:src="@{/img/hero_3.jpg}" th:alt="${item.nombrePaquete}"
@@ -68,7 +117,7 @@
                             </p>
                         </div>
 
-                        <!-- Servicios adicionales -->
+                        <!-- Servicios adicionales del item (si existen) -->
                         <div th:if="${item.serviciosAdicionales != null and !item.serviciosAdicionales.isEmpty()}"
                              class="mt-3">
                             <p class="text-sm font-medium text-gray-700 mb-1">Servicios adicionales:</p>
@@ -84,13 +133,14 @@
                         </div>
                     </div>
 
-                    <!-- Precio y acciones -->
+                    <!-- Precio y boton eliminar -->
                     <div class="md:w-1/4 flex flex-col items-end justify-between">
                         <div class="text-right">
                             <p class="text-sm text-gray-500">Subtotal</p>
                             <p class="text-xl font-bold text-red-600" th:text="${item.subtotalFormateado}">S/ 0.00</p>
                         </div>
 
+                        <!-- Boton eliminar item -->
                         <form th:action="@{/carrito/eliminar/{id}(id=${item.idItem})}" method="post" class="mt-4">
                             <button type="submit" class="text-red-600 hover:text-red-800 text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,11 +154,15 @@
             </div>
         </div>
 
-        <!-- Resumen del carrito (1 columna) -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             COLUMNA DERECHA (1/3): Resumen del pedido
+             Card sticky que sigue al usuario durante el scroll
+        ═══════════════════════════════════════════════════════════════════ -->
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-md p-6 border sticky top-6">
                 <h3 class="text-lg font-bold mb-4 pb-4 border-b">Resumen del pedido</h3>
 
+                <!-- Desglose de items -->
                 <div class="space-y-3 mb-6">
                     <div class="flex justify-between text-gray-600">
                         <span>Items (<span th:text="${carrito.cantidadItems}">0</span>)</span>
@@ -116,6 +170,7 @@
                     </div>
                 </div>
 
+                <!-- Total -->
                 <div class="border-t pt-4 mb-6">
                     <div class="flex justify-between text-lg font-bold">
                         <span>Total</span>
@@ -125,16 +180,19 @@
 
                 <!-- Botones de accion -->
                 <div class="space-y-3">
+                    <!-- Confirmar reservas (accion principal) -->
                     <form th:action="@{/carrito/checkout}" method="post">
                         <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-medium">
                             Confirmar Reservas
                         </button>
                     </form>
 
+                    <!-- Seguir comprando -->
                     <a th:href="@{/paquetes}" class="block w-full text-center border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition">
                         Seguir comprando
                     </a>
 
+                    <!-- Vaciar carrito (accion destructiva) -->
                     <form th:action="@{/carrito/vaciar}" method="post">
                         <button type="submit" class="w-full text-red-600 hover:text-red-800 text-sm py-2">
                             Vaciar carrito

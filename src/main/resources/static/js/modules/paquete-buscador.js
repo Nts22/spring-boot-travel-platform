@@ -1,41 +1,142 @@
 /**
- * Modulo de busqueda de paquetes turisticos
+ * ============================================================================
+ * MODULO: Buscador de Paquetes Turisticos
+ * ============================================================================
  * @namespace NMViajes.PaqueteBuscador
- * @requires NMViajes.Utils
- * @requires NMViajes.Toast
  *
- * NOTA: Los datos (fechas, precios) vienen formateados desde el controlador.
+ * Modulo para buscar y filtrar paquetes turisticos con AJAX.
+ * Renderiza dinamicamente las cards de paquetes sin recargar la pagina.
+ *
+ * ============================================================================
+ * VISTA QUE USA ESTE MODULO:
+ * ============================================================================
+ *   templates/paquete/list.html
+ *
+ * ============================================================================
+ * ELEMENTOS HTML REQUERIDOS (IDs):
+ * ============================================================================
+ *
+ * FILTROS:
+ *   #filtro-destino        - <select> con destinos disponibles
+ *   #filtro-fecha-inicio   - <input> datepicker Flowbite (formato dd/mm/yyyy)
+ *   #filtro-fecha-fin      - <input> datepicker Flowbite (formato dd/mm/yyyy)
+ *
+ * BOTONES:
+ *   #btn-buscar            - Boton para ejecutar la busqueda
+ *   #btn-limpiar           - Boton dentro del mensaje vacio para limpiar
+ *   #btn-limpiar-filtros   - Boton X para limpiar filtros (en la barra)
+ *
+ * CONTENEDORES:
+ *   #grid-paquetes         - <div> donde se renderizan las cards de paquetes
+ *   #loading-spinner       - Spinner que se muestra durante la carga
+ *   #mensaje-vacio         - Mensaje cuando no hay resultados
+ *   #contador-resultados   - <span> que muestra "X resultados"
+ *   #badge-filtros         - Badge que indica cuando hay filtros activos
+ *
+ * ============================================================================
+ * API BACKEND:
+ * ============================================================================
+ *
+ *   GET /api/v1/paquetes/buscar
+ *
+ *   Query params (todos opcionales):
+ *     - idDestino: Integer
+ *     - fechaInicio: String (yyyy-MM-dd)
+ *     - fechaFin: String (yyyy-MM-dd)
+ *
+ *   Response: Array de PaqueteResponse
+ *     {
+ *       idPaquete: number,
+ *       nombre: string,
+ *       descripcion: string,
+ *       precio: string,           // Ya formateado desde el backend
+ *       fechaInicio: string,      // Ya formateado: "15/01/2026"
+ *       fechaFin: string,
+ *       nombreDestino: string,
+ *       stockDisponible: number
+ *     }
+ *
+ * ============================================================================
+ * DEPENDENCIAS:
+ * ============================================================================
+ *   - NMViajes.Utils  -> escapeHtml(), sleep()
+ *   - NMViajes.Toast  -> notificaciones
+ *   - Flowbite        -> datepickers
+ *
+ * ============================================================================
+ * USO:
+ * ============================================================================
+ *
+ *   // Inicializar (generalmente en el template)
+ *   NMViajes.PaqueteBuscador.init({
+ *       imgDefault: '/img/carrusel/hero_3.jpg'
+ *   });
+ *
+ *   // Ejecutar busqueda manualmente
+ *   NMViajes.PaqueteBuscador.buscar();
+ *
+ *   // Limpiar filtros y buscar todos
+ *   NMViajes.PaqueteBuscador.limpiarFiltros();
+ *
+ * ============================================================================
  */
 window.NMViajes = window.NMViajes || {};
 
 NMViajes.PaqueteBuscador = (function() {
     'use strict';
 
-    // Dependencias
+    // ========================================================================
+    // DEPENDENCIAS
+    // ========================================================================
     const Utils = NMViajes.Utils;
     const Toast = NMViajes.Toast;
 
-    // Configuracion
+    // ========================================================================
+    // CONFIGURACION
+    // ========================================================================
+
+    /**
+     * Configuracion del modulo.
+     * API_URL: Endpoint del backend para buscar paquetes
+     * MIN_LOADING_TIME: Tiempo minimo de loading para mejor UX (evita flashes)
+     */
     const CONFIG = {
         API_URL: '/api/v1/paquetes/buscar',
         MIN_LOADING_TIME: 500
     };
 
-    // Elementos DOM (se inicializan en init)
+    /**
+     * Referencias a elementos del DOM.
+     * Se inicializan en init() para evitar errores si el DOM no esta listo.
+     */
     let DOM = {};
 
-    // Imagen por defecto (se puede sobrescribir en init)
+    /**
+     * Imagen por defecto para las cards de paquetes.
+     * Se puede sobrescribir en init({ imgDefault: '...' })
+     */
     let imgDefault = '/img/carrusel/hero_3.jpg';
 
+    // ========================================================================
+    // RENDERIZADO DE CARDS
+    // ========================================================================
+
     /**
-     * Crea el HTML de una card de paquete
-     * Los campos precio, fechaInicio, fechaFin ya vienen formateados del servidor
+     * Crea el HTML de una card de paquete.
+     *
+     * IMPORTANTE: Los campos precio, fechaInicio, fechaFin ya vienen
+     * formateados desde el backend (FormatConfig.java).
+     *
+     * @param {Object} paquete - Datos del paquete desde la API
+     * @returns {string} HTML de la card
      */
     function crearCardPaquete(paquete) {
+        // Stock: mostrar cantidad o "Agotado"
         const stockHtml = paquete.stockDisponible && paquete.stockDisponible > 0
             ? `<span>${paquete.stockDisponible} disponibles</span>`
             : `<span class="text-red-500">Agotado</span>`;
 
+        // Destino: solo mostrar si existe
         const destinoHtml = paquete.nombreDestino
             ? `<span class="ml-2">| ${Utils.escapeHtml(paquete.nombreDestino)}</span>`
             : '';
@@ -74,8 +175,13 @@ NMViajes.PaqueteBuscador = (function() {
         `;
     }
 
+    // ========================================================================
+    // FUNCIONES DE UI
+    // ========================================================================
+
     /**
-     * Muestra u oculta el spinner de carga
+     * Muestra u oculta el spinner de carga.
+     * @param {boolean} show - true para mostrar, false para ocultar
      */
     function mostrarLoading(show) {
         if (DOM.loadingSpinner) {
@@ -90,11 +196,13 @@ NMViajes.PaqueteBuscador = (function() {
     }
 
     /**
-     * Renderiza los paquetes en el grid
+     * Renderiza los paquetes en el grid.
+     * @param {Array} paquetes - Array de paquetes desde la API
      */
     function renderizarPaquetes(paquetes) {
         mostrarLoading(false);
 
+        // Sin resultados: mostrar mensaje vacio
         if (!paquetes || paquetes.length === 0) {
             DOM.gridPaquetes.classList.add('hidden');
             DOM.mensajeVacio.classList.remove('hidden');
@@ -104,17 +212,19 @@ NMViajes.PaqueteBuscador = (function() {
             return;
         }
 
+        // Con resultados: renderizar cards
         DOM.mensajeVacio.classList.add('hidden');
         DOM.gridPaquetes.classList.remove('hidden');
         DOM.gridPaquetes.innerHTML = paquetes.map(p => crearCardPaquete(p)).join('');
 
+        // Actualizar contador
         if (DOM.contadorResultados) {
             DOM.contadorResultados.textContent = `${paquetes.length} resultado${paquetes.length !== 1 ? 's' : ''}`;
         }
     }
 
     /**
-     * Actualiza el badge de filtros activos
+     * Actualiza el badge que indica si hay filtros activos.
      */
     function actualizarBadgeFiltros() {
         if (!DOM.badgeFiltros) return;
@@ -126,8 +236,19 @@ NMViajes.PaqueteBuscador = (function() {
         DOM.badgeFiltros.classList.toggle('hidden', !hayFiltros);
     }
 
+    // ========================================================================
+    // CONVERSION DE FECHAS
+    // ========================================================================
+
     /**
-     * Convierte fecha dd/mm/yyyy (Flowbite) a yyyy-mm-dd (API)
+     * Convierte fecha de formato Flowbite (dd/mm/yyyy) a formato API (yyyy-mm-dd).
+     *
+     * @param {string} fechaStr - Fecha en formato dd/mm/yyyy
+     * @returns {string|null} Fecha en formato yyyy-mm-dd o null si es invalida
+     *
+     * @example
+     * parseFechaFlowbite('15/01/2026') // '2026-01-15'
+     * parseFechaFlowbite('')           // null
      */
     function parseFechaFlowbite(fechaStr) {
         if (!fechaStr) return null;
@@ -136,10 +257,16 @@ NMViajes.PaqueteBuscador = (function() {
         return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
 
+    // ========================================================================
+    // BUSQUEDA
+    // ========================================================================
+
     /**
-     * Ejecuta la busqueda de paquetes
+     * Ejecuta la busqueda de paquetes con los filtros actuales.
+     * @returns {Promise<void>}
      */
     async function buscar() {
+        // 1. Construir query params
         const params = new URLSearchParams();
 
         if (DOM.filtroDestino?.value) {
@@ -156,12 +283,14 @@ NMViajes.PaqueteBuscador = (function() {
             params.append('fechaFin', fechaFin);
         }
 
+        // 2. Mostrar loading y actualizar badge
         mostrarLoading(true);
         actualizarBadgeFiltros();
 
         const startTime = Date.now();
 
         try {
+            // 3. Hacer request a la API
             const response = await fetch(`${CONFIG.API_URL}?${params.toString()}`);
 
             if (!response.ok) {
@@ -170,12 +299,13 @@ NMViajes.PaqueteBuscador = (function() {
 
             const paquetes = await response.json();
 
-            // Asegurar tiempo minimo de loading para mejor UX
+            // 4. Asegurar tiempo minimo de loading para mejor UX
             const elapsed = Date.now() - startTime;
             if (elapsed < CONFIG.MIN_LOADING_TIME) {
                 await Utils.sleep(CONFIG.MIN_LOADING_TIME - elapsed);
             }
 
+            // 5. Renderizar resultados
             renderizarPaquetes(paquetes);
 
             if (paquetes.length > 0) {
@@ -195,7 +325,7 @@ NMViajes.PaqueteBuscador = (function() {
     }
 
     /**
-     * Limpia todos los filtros y ejecuta busqueda
+     * Limpia todos los filtros y ejecuta una busqueda sin filtros.
      */
     function limpiarFiltros() {
         if (DOM.filtroDestino) DOM.filtroDestino.value = '';
@@ -207,9 +337,15 @@ NMViajes.PaqueteBuscador = (function() {
         Toast.info('Filtros limpiados');
     }
 
+    // ========================================================================
+    // INICIALIZACION
+    // ========================================================================
+
     /**
-     * Inicializa el modulo
-     * @param {object} options - Opciones de configuracion
+     * Inicializa el modulo.
+     *
+     * @param {Object} options - Opciones de configuracion
+     * @param {string} options.imgDefault - URL de imagen por defecto para cards
      */
     function init(options = {}) {
         // Sobrescribir imagen por defecto si se proporciona
@@ -219,12 +355,17 @@ NMViajes.PaqueteBuscador = (function() {
 
         // Inicializar referencias DOM
         DOM = {
+            // Filtros
             filtroDestino: document.getElementById('filtro-destino'),
             filtroFechaInicio: document.getElementById('filtro-fecha-inicio'),
             filtroFechaFin: document.getElementById('filtro-fecha-fin'),
+
+            // Botones
             btnBuscar: document.getElementById('btn-buscar'),
             btnLimpiar: document.getElementById('btn-limpiar'),
             btnLimpiarFiltros: document.getElementById('btn-limpiar-filtros'),
+
+            // Contenedores
             gridPaquetes: document.getElementById('grid-paquetes'),
             loadingSpinner: document.getElementById('loading-spinner'),
             mensajeVacio: document.getElementById('mensaje-vacio'),
@@ -237,7 +378,7 @@ NMViajes.PaqueteBuscador = (function() {
         DOM.btnLimpiar?.addEventListener('click', limpiarFiltros);
         DOM.btnLimpiarFiltros?.addEventListener('click', limpiarFiltros);
 
-        // Contar resultados iniciales
+        // Contar resultados iniciales (los que vienen del servidor con Thymeleaf)
         if (DOM.gridPaquetes && DOM.contadorResultados) {
             const cardsIniciales = DOM.gridPaquetes.querySelectorAll(':scope > div').length;
             if (cardsIniciales > 0) {
@@ -253,7 +394,10 @@ NMViajes.PaqueteBuscador = (function() {
         console.log('PaqueteBuscador inicializado');
     }
 
-    // API publica
+    // ========================================================================
+    // API PUBLICA
+    // ========================================================================
+
     return {
         init,
         buscar,

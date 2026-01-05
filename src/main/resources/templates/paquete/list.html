@@ -1,11 +1,50 @@
+<!--
+================================================================================
+LISTA DE PAQUETES - paquete/list.html
+================================================================================
+Vista que muestra la lista de paquetes turisticos con buscador AJAX.
 
-<!-- ================= BUSCADOR ================= -->
+MODELO ESPERADO:
+- paquetes: List<PaqueteView> - Lista de paquetes disponibles
+- destinos: List<Destino> - Lista de destinos para el filtro
+
+Cada PaqueteView contiene:
+- idPaquete: Integer
+- nombre, descripcion: String
+- precio: BigDecimal
+- fechaInicioFormateada, fechaFinFormateada: String (formato dd/MM/yyyy)
+- nombreDestino: String
+- stockDisponible: Integer
+
+URL: /paquetes
+CONTROLADOR: PaqueteWebController.listar()
+
+JAVASCRIPT:
+- js/core/utils.js
+- js/core/toast.js
+- js/modules/paquete-buscador.js
+
+NOTA: Esta vista tiene renderizado hibrido:
+1. Carga inicial: Thymeleaf renderiza las cards en el servidor
+2. Busquedas: JavaScript actualiza las cards via AJAX
+================================================================================
+-->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SECCION: BUSCADOR
+     Formulario de filtros para buscar paquetes.
+
+     IDs REQUERIDOS por paquete-buscador.js:
+     - #filtro-destino, #filtro-fecha-inicio, #filtro-fecha-fin (filtros)
+     - #btn-buscar, #btn-limpiar-filtros (botones)
+═══════════════════════════════════════════════════════════════════════════ -->
 <section class="bg-white mt-6 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-6">
         <h2 class="text-xl font-semibold mb-4">Buscar paquetes turisticos</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <!-- Select Destino con estilo Flowbite -->
+
+            <!-- Filtro: Destino -->
             <div>
                 <label for="filtro-destino" class="block mb-2 text-sm font-medium text-gray-900">Destino</label>
                 <select id="filtro-destino"
@@ -17,7 +56,7 @@
                 </select>
             </div>
 
-            <!-- Datepicker Flowbite - Fecha Inicio -->
+            <!-- Filtro: Fecha Inicio (Flowbite Datepicker) -->
             <div>
                 <label for="filtro-fecha-inicio" class="block mb-2 text-sm font-medium text-gray-900">Desde</label>
                 <div class="relative">
@@ -36,7 +75,7 @@
                 </div>
             </div>
 
-            <!-- Datepicker Flowbite - Fecha Fin -->
+            <!-- Filtro: Fecha Fin (Flowbite Datepicker) -->
             <div>
                 <label for="filtro-fecha-fin" class="block mb-2 text-sm font-medium text-gray-900">Hasta</label>
                 <div class="relative">
@@ -55,7 +94,7 @@
                 </div>
             </div>
 
-            <!-- Botones -->
+            <!-- Botones de accion -->
             <div class="flex gap-2">
                 <button id="btn-buscar"
                         type="button"
@@ -83,19 +122,32 @@
 </section>
 
 
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SECCION: RESULTADOS
+     Grid de paquetes, spinner de carga y mensaje vacio.
+
+     IDs REQUERIDOS por paquete-buscador.js:
+     - #grid-paquetes (contenedor de cards)
+     - #loading-spinner (spinner durante busqueda)
+     - #mensaje-vacio (cuando no hay resultados)
+     - #contador-resultados (muestra "X resultados")
+     - #badge-filtros (indica filtros activos)
+     - #btn-limpiar (boton dentro del mensaje vacio)
+═══════════════════════════════════════════════════════════════════════════ -->
 <section class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Cabecera con contador y badge -->
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Paquetes disponibles</h2>
         <div class="flex items-center gap-3">
             <span id="contador-resultados" class="text-sm text-gray-500"></span>
-            <!-- Badge de filtros activos -->
             <span id="badge-filtros" class="hidden bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                 Filtros activos
             </span>
         </div>
     </div>
 
-    <!-- Spinner de carga (Flowbite) -->
+    <!-- Spinner de carga (visible durante busquedas AJAX) -->
     <div id="loading-spinner" class="hidden text-center py-10">
         <div role="status">
             <svg aria-hidden="true" class="inline w-10 h-10 text-gray-200 animate-spin fill-red-600" viewBox="0 0 100 101" fill="none">
@@ -106,7 +158,7 @@
         </div>
     </div>
 
-    <!-- Mensaje cuando no hay paquetes (Flowbite Alert style) -->
+    <!-- Mensaje cuando no hay resultados -->
     <div id="mensaje-vacio" class="hidden">
         <div class="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-lg border border-gray-200">
             <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,10 +174,17 @@
         </div>
     </div>
 
-    <!-- Grid de paquetes (carga inicial con Thymeleaf) -->
+    <!--
+    GRID DE PAQUETES
+    Renderizado inicial: Thymeleaf (th:each)
+    Renderizado dinamico: paquete-buscador.js (crearCardPaquete)
+
+    IMPORTANTE: La estructura de las cards debe coincidir entre Thymeleaf
+    y JavaScript para mantener consistencia visual.
+    -->
     <div id="grid-paquetes" class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <!-- ===== CARD PAQUETE (iteracion dinamica) ===== -->
+        <!-- Card de Paquete (iteracion Thymeleaf) -->
         <div th:each="paquete : ${paquetes}"
              class="bg-white rounded-lg shadow hover:shadow-lg transition">
             <img th:src="@{/img/carrusel/hero_3.jpg}"
@@ -173,7 +232,11 @@
     </div>
 </section>
 
-<!-- ================= SCRIPTS MODULARES ================= -->
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SCRIPTS
+     Carga los modulos JS necesarios para el buscador.
+     Orden de carga importante: utils -> toast -> paquete-buscador
+═══════════════════════════════════════════════════════════════════════════ -->
 <script th:src="@{/js/core/utils.js}"></script>
 <script th:src="@{/js/core/toast.js}"></script>
 <script th:src="@{/js/modules/paquete-buscador.js}"></script>
@@ -183,7 +246,7 @@
 (function() {
     'use strict';
 
-    // Configuracion desde Thymeleaf
+    // Configuracion desde Thymeleaf (imagen por defecto para las cards)
     const imgDefault = /*[[@{/img/carrusel/hero_3.jpg}]]*/ '/img/carrusel/hero_3.jpg';
 
     // Inicializar cuando el DOM este listo

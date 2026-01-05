@@ -1,7 +1,31 @@
+<!--
+================================================================================
+DETALLE DE PAQUETE - paquete/detail.html
+================================================================================
+Vista que muestra el detalle completo de un paquete turistico.
+
+MODELO ESPERADO (PaqueteView):
+- idPaquete: Integer
+- nombre, descripcion: String
+- precio: BigDecimal
+- fechaInicioFormateada, fechaFinFormateada: String (formato dd/MM/yyyy)
+- nombreDestino: String (puede ser null)
+- stockDisponible: Integer
+
+URL: /paquetes/{id}
+CONTROLADOR: PaqueteWebController.detalle()
+
+ACCIONES:
+- "Agregar al carrito" -> /carrito/agregar/{id} (si hay stock)
+- "Volver" -> /paquetes
+================================================================================
+-->
 
 <section class="max-w-7xl mx-auto px-6 py-10">
 
-    <!-- Breadcrumb -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVEGACION - Breadcrumb
+    ═══════════════════════════════════════════════════════════════════════ -->
     <nav class="mb-6 text-sm text-gray-500">
         <a th:href="@{/}" class="hover:text-red-600">Inicio</a>
         <span class="mx-2">/</span>
@@ -12,25 +36,30 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-        <!-- Imagen -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             COLUMNA IZQUIERDA: Imagen del paquete
+        ═══════════════════════════════════════════════════════════════════ -->
         <div>
             <img th:src="@{/img/hero_3.jpg}"
                  th:alt="${paquete.nombre}"
                  class="rounded-lg object-cover w-full h-96">
         </div>
 
-        <!-- Info del paquete -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             COLUMNA DERECHA: Informacion del paquete
+        ═══════════════════════════════════════════════════════════════════ -->
         <div>
+            <!-- Nombre del paquete -->
             <h2 class="text-3xl font-bold mb-2" th:text="${paquete.nombre}">
                 Nombre del Paquete
             </h2>
 
-            <!-- Destino -->
+            <!-- Destino (opcional) -->
             <p th:if="${paquete.nombreDestino}" class="text-gray-500 mb-4">
                 Destino: <span class="font-medium text-gray-700" th:text="${paquete.nombreDestino}">Destino</span>
             </p>
 
-            <!-- Fechas -->
+            <!-- Fechas del paquete -->
             <div class="flex items-center gap-4 mb-4 text-sm text-gray-600">
                 <div>
                     <span class="font-medium">Inicio:</span>
@@ -55,7 +84,11 @@
                 <span class="text-sm text-gray-500 ml-2">por persona</span>
             </div>
 
-            <!-- Stock -->
+            <!--
+            BADGE DE STOCK
+            - Verde si hay stock disponible
+            - Rojo si esta agotado
+            -->
             <div class="mb-6">
                 <span th:if="${paquete.stockDisponible != null and paquete.stockDisponible != '0'}"
                       class="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
@@ -67,9 +100,14 @@
                 </span>
             </div>
 
-            <!-- Botones -->
+            <!-- ═══════════════════════════════════════════════════════════════
+                 BOTONES DE ACCION
+                 - Agregar al carrito: Solo si hay stock
+                 - Volver: Siempre visible
+            ═══════════════════════════════════════════════════════════════ -->
             <div class="flex flex-wrap gap-4">
-                <!-- Boton Agregar al Carrito -->
+
+                <!-- Boton: Agregar al Carrito (activo si hay stock) -->
                 <a th:if="${paquete.stockDisponible != null and paquete.stockDisponible != '0'}"
                    th:href="@{/carrito/agregar/{id}(id=${paquete.idPaquete})}"
                    class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition inline-flex items-center gap-2">
@@ -78,6 +116,8 @@
                     </svg>
                     Agregar al carrito
                 </a>
+
+                <!-- Boton: Agregar al Carrito (deshabilitado si no hay stock) -->
                 <span th:if="${paquete.stockDisponible == null or paquete.stockDisponible == '0'}"
                       class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed inline-flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,6 +125,8 @@
                     </svg>
                     Agregar al carrito
                 </span>
+
+                <!-- Boton: Volver a la lista -->
                 <a th:href="@{/paquetes}"
                    class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition">
                     Volver

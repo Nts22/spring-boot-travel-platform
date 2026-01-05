@@ -1,6 +1,33 @@
+<!--
+================================================================================
+LISTA DE RESERVAS - list.html
+================================================================================
+Vista que muestra la lista de todas las reservas del usuario.
+
+MODELO ESPERADO (List<ReservaView>):
+Cada ReservaView contiene:
+- idReserva: Integer - ID unico de la reserva
+- totalPagarFormateado: String - Total formateado "S/ 1,500.00"
+- estadoReserva: String - Texto legible ("Pendiente de Pago", "Pagada", etc.)
+- estadoReservaCode: String - Codigo enum ("PENDIENTE", "PAGADA", "CANCELADA")
+- fechaCreacionFormateada: String - Fecha formateada "dd/MM/yyyy HH:mm"
+- items: List<ReservaItemView> - Items/paquetes de la reserva
+
+FLASH ATTRIBUTES (del controlador):
+- successMessage: Mensaje de operacion exitosa
+- errorMessage: Mensaje de error
+
+URL: /reservas
+CONTROLADOR: ReservaWebController.listar()
+================================================================================
+-->
+
 <section class="max-w-7xl mx-auto px-6 py-10">
 
-    <!-- Breadcrumb -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVEGACION - Breadcrumb
+         Ruta: Inicio > Mis Reservas
+    ═══════════════════════════════════════════════════════════════════════ -->
     <nav class="mb-6 text-sm text-gray-500">
         <a th:href="@{/}" class="hover:text-red-600">Inicio</a>
         <span class="mx-2">/</span>
@@ -9,7 +36,10 @@
 
     <h2 class="text-3xl font-bold mb-6">Mis Reservas</h2>
 
-    <!-- Mensajes de feedback -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         MENSAJES DE FEEDBACK
+         Flash messages del controlador despues de operaciones
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${successMessage}" class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
         <span th:text="${successMessage}">Mensaje de exito</span>
     </div>
@@ -17,7 +47,10 @@
         <span th:text="${errorMessage}">Mensaje de error</span>
     </div>
 
-    <!-- Lista vacia -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ESTADO VACIO
+         Se muestra cuando el usuario no tiene reservas
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${#lists.isEmpty(reservas)}" class="text-center py-12">
         <p class="text-gray-500 mb-4">No tienes reservas todavia.</p>
         <a th:href="@{/paquetes}"
@@ -26,9 +59,22 @@
         </a>
     </div>
 
-    <!-- Tabla de reservas -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TABLA DE RESERVAS
+         Lista todas las reservas del usuario con informacion resumida
+
+         Columnas:
+         - #: ID de la reserva
+         - Paquetes: Nombres de los paquetes incluidos
+         - Fecha Reserva: Cuando se creo la reserva
+         - Total: Monto total a pagar
+         - Estado: Badge con color segun estado
+         - Acciones: Link al detalle
+    ═══════════════════════════════════════════════════════════════════════ -->
     <div th:if="${!#lists.isEmpty(reservas)}" class="overflow-x-auto">
         <table class="min-w-full bg-white rounded-lg shadow">
+
+            <!-- Cabecera de la tabla -->
             <thead class="bg-gray-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">#</th>
@@ -39,23 +85,48 @@
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Acciones</th>
                 </tr>
             </thead>
+
+            <!-- Cuerpo de la tabla - Iteracion sobre reservas -->
             <tbody class="divide-y divide-gray-200">
                 <tr th:each="reserva : ${reservas}" class="hover:bg-gray-50">
+
+                    <!-- Columna: ID de reserva -->
                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.idReserva}">1</td>
+
+                    <!-- Columna: Paquetes incluidos (puede haber multiples) -->
                     <td class="px-6 py-4 text-sm text-gray-800">
                         <div th:each="item : ${reserva.items}" class="mb-1">
                             <span class="font-medium" th:text="${item.nombrePaquete}">Paquete</span>
                             <span class="text-gray-500" th:text="' - ' + ${item.nombreDestino}"> - Destino</span>
                         </div>
                     </td>
+
+                    <!-- Columna: Fecha de creacion -->
                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${reserva.fechaCreacionFormateada}">01/01/2025</td>
+
+                    <!-- Columna: Total a pagar -->
                     <td class="px-6 py-4 text-sm text-red-600 font-bold" th:text="${reserva.totalPagarFormateado}">S/ 0.00</td>
+
+                    <!--
+                    Columna: Badge de Estado
+                    IMPORTANTE: Usar estadoReservaCode para comparar (codigo enum),
+                    y estadoReserva para mostrar (texto legible).
+
+                    Colores:
+                    - PENDIENTE: Amarillo
+                    - PAGADA: Verde
+                    - CANCELADA: Rojo
+                    - Otro: Gris (fallback)
+                    -->
                     <td class="px-6 py-4">
-                        <span th:class="${reserva.estadoReserva == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' :
-                                         (reserva.estadoReserva == 'CONFIRMADA' ? 'bg-green-100 text-green-800' :
-                                         'bg-gray-100 text-gray-800')} + ' text-xs px-2 py-1 rounded-full'"
+                        <span th:class="${reserva.estadoReservaCode == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' :
+                                         (reserva.estadoReservaCode == 'PAGADA' ? 'bg-green-100 text-green-800' :
+                                         (reserva.estadoReservaCode == 'CANCELADA' ? 'bg-red-100 text-red-800' :
+                                         'bg-gray-100 text-gray-800'))} + ' text-xs px-2 py-1 rounded-full'"
                               th:text="${reserva.estadoReserva}">PENDIENTE</span>
                     </td>
+
+                    <!-- Columna: Link a detalle -->
                     <td class="px-6 py-4">
                         <a th:href="@{/reservas/{id}(id=${reserva.idReserva})}"
                            class="text-red-600 hover:text-red-800 text-sm font-medium">
