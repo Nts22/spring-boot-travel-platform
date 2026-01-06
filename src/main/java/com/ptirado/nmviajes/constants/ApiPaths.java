@@ -36,4 +36,9 @@ public final class ApiPaths {
     public static final String CARRITO_VACIAR = "/vaciar";
     public static final String CARRITO_CHECKOUT = "/checkout";
     public static final String CARRITO_CONTAR = "/contar";
+
+    // AUTH
+    public static final String AUTH = API_BASE + "/auth";
+    public static final String AUTH_REGISTRO = "/registro";
+    public static final String AUTH_PERFIL = "/perfil";
 }

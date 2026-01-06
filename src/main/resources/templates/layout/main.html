@@ -31,7 +31,8 @@ ESTILOS:
 -->
 <!DOCTYPE html>
 <html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -67,23 +68,64 @@ ESTILOS:
                     Contacto
                 </a>
             </li>
-            <li><a th:href="@{/reservas}" class="hover:text-red-600">Mis Reservas</a></li>
-            <!-- Icono del carrito con contador -->
-            <li>
+            <!-- Solo para usuarios autenticados -->
+            <li sec:authorize="isAuthenticated()">
+                <a th:href="@{/reservas}" class="hover:text-red-600">Mis Reservas</a>
+            </li>
+            <!-- Icono del carrito con contador (solo autenticados) -->
+            <li sec:authorize="isAuthenticated()">
                 <a th:href="@{/carrito}" class="relative hover:text-red-600 flex items-center gap-1" title="Mi Carrito">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    <!--
-                    CONTADOR DEL CARRITO
-                    - Se actualiza via AJAX al cargar la pagina
-                    - ID: carrito-contador (usado por el script al final)
-                    - Se oculta si es 0
-                    -->
                     <span id="carrito-contador"
                           class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">
                         0
                     </span>
+                </a>
+            </li>
+            <!-- Menu de usuario autenticado -->
+            <li sec:authorize="isAuthenticated()" class="relative">
+                <button type="button" id="user-menu-button" data-dropdown-toggle="user-dropdown"
+                        class="flex items-center gap-2 text-sm font-medium hover:text-red-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span sec:authentication="name">Usuario</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <!-- Dropdown menu -->
+                <div id="user-dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+                    <div class="px-4 py-3 text-sm text-gray-900">
+                        <div sec:authentication="name">Usuario</div>
+                        <div class="font-medium truncate text-gray-500" sec:authentication="principal.username">email@ejemplo.com</div>
+                    </div>
+                    <ul class="py-2 text-sm text-gray-700">
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <a th:href="@{/admin}" class="block px-4 py-2 hover:bg-gray-100">Panel Admin</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/reservas}" class="block px-4 py-2 hover:bg-gray-100">Mis Reservas</a>
+                        </li>
+                    </ul>
+                    <div class="py-2">
+                        <form th:action="@{/logout}" method="POST">
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Cerrar Sesion
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            <!-- Links para usuarios no autenticados -->
+            <li sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}" class="hover:text-red-600">Iniciar Sesion</a>
+            </li>
+            <li sec:authorize="!isAuthenticated()">
+                <a th:href="@{/registro}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                    Registrarse
                 </a>
             </li>
         </ul>
@@ -238,29 +280,28 @@ ESTILOS:
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SCRIPT: Contador del carrito
      Actualiza el badge del carrito en el header via AJAX
+     Solo se ejecuta para usuarios autenticados
 ═══════════════════════════════════════════════════════════════════════════ -->
-<script>
+<script sec:authorize="isAuthenticated()" th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
     actualizarContadorCarrito();
 });
 
 /**
  * Actualiza el contador del carrito consultando la API.
- * Endpoint: GET /api/v1/carrito/contar?idUsuario=X
- *
- * TODO: En produccion, el idUsuario deberia venir de la sesion/autenticacion
+ * Endpoint: GET /api/v1/carrito/contar
+ * El usuario se obtiene automaticamente del contexto de seguridad
  */
 function actualizarContadorCarrito() {
-    // Usuario por defecto (en produccion vendria de la sesion)
-    const idUsuario = 1;
-
-    fetch('/api/v1/carrito/contar?idUsuario=' + idUsuario)
-        .then(response => response.json())
+    fetch('/api/v1/carrito/contar')
+        .then(response => {
+            if (!response.ok) return 0;
+            return response.json();
+        })
         .then(cantidad => {
             const contador = document.getElementById('carrito-contador');
             if (contador) {
                 if (cantidad > 0) {
-                    // Mostrar "9+" si hay mas de 9 items
                     contador.textContent = cantidad > 9 ? '9+' : cantidad;
                     contador.classList.remove('hidden');
                 } else {

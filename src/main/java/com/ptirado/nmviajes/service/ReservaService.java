@@ -116,6 +116,15 @@ public interface ReservaService {
      */
     List<ReservaView> listarPorUsuarioParaWeb(Integer idUsuario);
 
+    /**
+     * Lista las reservas de un usuario de forma paginada para la vista web.
+     *
+     * @param idUsuario ID del usuario
+     * @param pageable Configuracion de paginacion
+     * @return Pagina de reservas del usuario en formato ViewModel
+     */
+    Page<ReservaView> listarPorUsuarioParaWebPaginado(Integer idUsuario, Pageable pageable);
+
     // ╔═══════════════════════════════════════════════════════════════════════════╗
     // ║                        PAGO Y CANCELACION                                  ║
     // ║  Operaciones de cambio de estado de la reserva                            ║

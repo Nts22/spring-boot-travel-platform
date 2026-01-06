@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ptirado.nmviajes.dto.form.ReservaForm;
+import com.ptirado.nmviajes.security.CustomUserDetails;
 import com.ptirado.nmviajes.exception.api.BadRequestException;
 import com.ptirado.nmviajes.exception.api.NotFoundException;
 import com.ptirado.nmviajes.service.PaqueteService;
@@ -56,10 +58,6 @@ public class ReservaWebController {
 
     private static final Logger log = LoggerFactory.getLogger(ReservaWebController.class);
 
-    // TODO: En produccion, obtener el ID del usuario autenticado desde Spring Security
-    // Ejemplo: @AuthenticationPrincipal UserDetails userDetails
-    private static final Integer USUARIO_POR_DEFECTO = 1;
-
     private final ReservaService reservaService;
     private final PaqueteService paqueteService;
     private final ServicioAdicionalService servicioAdicionalService;
@@ -78,8 +76,10 @@ public class ReservaWebController {
      * @return Vista de lista de reservas
      */
     @GetMapping
-    public String listar(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<ReservaView> reservasPage = reservaService.listarParaWebPaginado(
+    public String listar(@AuthenticationPrincipal CustomUserDetails userDetails,
+                         @RequestParam(defaultValue = "0") int page, Model model) {
+        Page<ReservaView> reservasPage = reservaService.listarPorUsuarioParaWebPaginado(
+                userDetails.getIdUsuario(),
                 PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "idReserva")));
         model.addAttribute("reservas", reservasPage.getContent());
         model.addAttribute("currentPage", page);
@@ -132,18 +132,20 @@ public class ReservaWebController {
     /**
      * Muestra el formulario para crear una nueva reserva.
      *
+     * @param userDetails Usuario autenticado
      * @param idPaquete ID del paquete a reservar
      * @param model Modelo para la vista
      * @return Vista del formulario de reserva
      */
     @GetMapping("/nueva/{idPaquete}")
-    public String mostrarFormulario(@PathVariable Integer idPaquete, Model model) {
+    public String mostrarFormulario(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                    @PathVariable Integer idPaquete, Model model) {
         PaqueteView paquete = paqueteService.obtenerParaWeb(idPaquete);
         List<ServicioAdicionalView> servicios = servicioAdicionalService.listarActivosParaWeb();
 
         ReservaForm form = ReservaForm.builder()
                 .idPaquete(idPaquete)
-                .idUsuario(USUARIO_POR_DEFECTO)
+                .idUsuario(userDetails.getIdUsuario())
                 .build();
 
         model.addAttribute("reservaForm", form);

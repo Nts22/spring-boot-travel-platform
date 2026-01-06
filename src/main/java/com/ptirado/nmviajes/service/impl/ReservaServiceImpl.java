@@ -386,6 +386,14 @@ public class ReservaServiceImpl implements ReservaService {
         return reservaMapper.toViewList(reservas);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReservaView> listarPorUsuarioParaWebPaginado(Integer idUsuario, Pageable pageable) {
+        getUsuarioOrThrow(idUsuario); // Valida que el usuario exista
+        return reservaRepository.findByUsuario_IdUsuario(idUsuario, pageable)
+                .map(reservaMapper::toViewModelFromEntity);
+    }
+
     // ╔═══════════════════════════════════════════════════════════════════════════╗
     // ║                        PAGO Y CANCELACION                                  ║
     // ║  Metodos para gestionar el ciclo de vida de la reserva                    ║

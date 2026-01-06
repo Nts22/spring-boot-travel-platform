@@ -2,6 +2,8 @@ package com.ptirado.nmviajes.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,8 @@ import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     List<Reserva> findByUsuario_IdUsuario(Integer idUsuario);
+
+    Page<Reserva> findByUsuario_IdUsuario(Integer idUsuario, Pageable pageable);
 
     List<Reserva> findByEstadoReserva(EstadoReserva estadoReserva);
 
