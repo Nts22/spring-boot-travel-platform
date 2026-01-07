@@ -69,8 +69,14 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Devuelve el nombre del usuario para mostrar en la UI.
      * Este metodo es usado por sec:authentication="name"
+     * Muestra nombre + apellido si existe, sino solo el nombre.
      */
     public String getName() {
-        return usuario.getNombre();
+        String nombre = usuario.getNombre();
+        String apellido = usuario.getApellido();
+        if (apellido != null && !apellido.trim().isEmpty()) {
+            return nombre + " " + apellido;
+        }
+        return nombre;
     }
 }

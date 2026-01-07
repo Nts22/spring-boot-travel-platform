@@ -1,0 +1,111 @@
+<!-- Usuarios List -->
+<main class="flex-1 p-6" xmlns:th="http://www.thymeleaf.org">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800">Gestión de Usuarios</h2>
+            <p class="text-gray-500 text-sm">Administra los usuarios del sistema</p>
+        </div>
+        <a href="/admin/usuarios/nuevo" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:if="${#lists.isEmpty(usuarios)}" class="text-center">
+                    <td colspan="7" class="px-6 py-8 text-gray-500">No hay usuarios registrados</td>
+                </tr>
+                <tr th:each="usuario : ${usuarios}" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${usuario.idUsuario}">1</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${usuario.email}">email@example.com</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${usuario.telefono} ?: '-'">999999999</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span th:each="role : ${usuario.roles}"
+                              th:class="'inline-block mr-1 px-2 py-1 text-xs font-medium rounded-full ' +
+                                  (${role.nombre == 'ROLE_ADMIN'} ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800')"
+                              th:text="${#strings.replace(role.nombre, 'ROLE_', '')}">USER</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span th:class="'px-2 py-1 text-xs font-medium rounded-full ' +
+                            (${usuario.estado == 'ACT'} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')"
+                            th:text="${usuario.estado == 'ACT'} ? 'Activo' : 'Inactivo'">Activo</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.idUsuario})}"
+                           class="text-blue-600 hover:text-blue-800">Editar</a>
+                        <button type="button"
+                                th:data-id="${usuario.idUsuario}"
+                                th:data-estado="${usuario.estado}"
+                                onclick="toggleEstado(this)"
+                                th:class="(${usuario.estado == 'ACT'} ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800')"
+                                th:text="${usuario.estado == 'ACT'} ? 'Desactivar' : 'Activar'">Toggle</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div th:if="${totalPages > 1}" class="mt-6 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            <a th:href="@{/admin/usuarios(page=${currentPage - 1})}"
+               th:classappend="${currentPage == 0} ? 'pointer-events-none opacity-50' : ''"
+               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                Anterior
+            </a>
+            <span class="px-3 py-2 text-sm text-gray-700">
+                Página <span th:text="${currentPage + 1}">1</span> de <span th:text="${totalPages}">1</span>
+            </span>
+            <a th:href="@{/admin/usuarios(page=${currentPage + 1})}"
+               th:classappend="${currentPage + 1 >= totalPages} ? 'pointer-events-none opacity-50' : ''"
+               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                Siguiente
+            </a>
+        </nav>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    function toggleEstado(btn) {
+        const id = btn.dataset.id;
+        const estado = btn.dataset.estado;
+        const nuevoEstado = estado === 'ACT' ? 'INA' : 'ACT';
+        const accion = estado === 'ACT' ? 'desactivar' : 'activar';
+
+        if (confirm(`¿Estás seguro de ${accion} este usuario?`)) {
+            fetch(`/api/v1/admin/usuarios/${id}/estado`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error al cambiar el estado');
+                }
+            });
+        }
+    }
+</script>

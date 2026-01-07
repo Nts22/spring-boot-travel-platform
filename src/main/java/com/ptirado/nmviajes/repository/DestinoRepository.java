@@ -11,4 +11,5 @@ import com.ptirado.nmviajes.entity.Destino;
 public interface DestinoRepository extends JpaRepository<Destino, Integer> {
     Optional<Destino> findByNombre(String nombre);
 
+    java.util.List<Destino> findByEstado(String estado);
 }
