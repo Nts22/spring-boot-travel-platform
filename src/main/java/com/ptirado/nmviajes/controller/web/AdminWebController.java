@@ -167,7 +167,7 @@ public class AdminWebController {
 
     @GetMapping("/destinos")
     public String listarDestinos(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Destino> destinos = destinoRepository.findAll(
+        Page<Destino> destinos = destinoRepository.findAllWithPaquetes(
                 PageRequest.of(page, PAGE_SIZE, Sort.by("idDestino").descending()));
 
         model.addAttribute("title", "Destinos");
@@ -241,7 +241,7 @@ public class AdminWebController {
 
     @GetMapping("/paquetes")
     public String listarPaquetes(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Paquete> paquetes = paqueteRepository.findAll(
+        Page<Paquete> paquetes = paqueteRepository.findAllWithDestino(
                 PageRequest.of(page, PAGE_SIZE, Sort.by("idPaquete").descending()));
 
         model.addAttribute("title", "Paquetes");
@@ -265,7 +265,7 @@ public class AdminWebController {
 
     @GetMapping("/paquetes/{id}/editar")
     public String editarPaqueteForm(@PathVariable Integer id, Model model) {
-        Paquete paquete = paqueteRepository.findById(id)
+        Paquete paquete = paqueteRepository.findByIdWithDestino(id)
                 .orElseThrow(() -> new RuntimeException("Paquete no encontrado"));
 
         model.addAttribute("title", "Editar Paquete");

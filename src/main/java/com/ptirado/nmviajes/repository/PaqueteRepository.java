@@ -3,7 +3,10 @@ package com.ptirado.nmviajes.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -43,4 +46,12 @@ public interface PaqueteRepository extends JpaRepository<Paquete, Integer> {
         @Param("fechaInicio") LocalDate fechaInicio,
         @Param("fechaFin") LocalDate fechaFin
     );
+
+    // Admin panel queries with eager loading
+    @Query(value = "SELECT p FROM Paquete p LEFT JOIN FETCH p.destino",
+           countQuery = "SELECT COUNT(p) FROM Paquete p")
+    Page<Paquete> findAllWithDestino(Pageable pageable);
+
+    @Query("SELECT p FROM Paquete p LEFT JOIN FETCH p.destino WHERE p.idPaquete = :id")
+    Optional<Paquete> findByIdWithDestino(@Param("id") Integer id);
 }
