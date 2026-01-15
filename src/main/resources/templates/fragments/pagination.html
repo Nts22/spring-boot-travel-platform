@@ -1,0 +1,43 @@
+<!-- Fragmento de Paginacion Reutilizable -->
+<!--
+    Uso: th:replace="~{fragments/pagination :: pagination(baseUrl='/admin/usuarios', currentPage=${currentPage}, totalPages=${totalPages}, filtroEstado=${filtroEstado}, filtroBusqueda=${filtroBusqueda})}"
+
+    Parametros requeridos:
+    - baseUrl: URL base para la paginacion (ej: '/admin/usuarios')
+    - currentPage: Pagina actual (0-indexed)
+    - totalPages: Total de paginas
+
+    Parametros opcionales:
+    - filtroEstado: Estado del filtro activo
+    - filtroBusqueda: Texto de busqueda activo
+-->
+<nav th:fragment="pagination(baseUrl, currentPage, totalPages, filtroEstado, filtroBusqueda)"
+     class="flex items-center space-x-1"
+     xmlns:th="http://www.thymeleaf.org">
+
+    <!-- Boton Anterior -->
+    <a th:href="@{${baseUrl}(page=${currentPage - 1}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
+       th:classappend="${currentPage == 0} ? 'pointer-events-none opacity-50' : ''"
+       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+        Anterior
+    </a>
+
+    <!-- Numeros de pagina -->
+    <th:block th:if="${totalPages > 0}" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <a th:href="@{${baseUrl}(page=${i}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
+           th:classappend="${i == currentPage} ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+           class="px-3 py-2 text-sm font-medium border rounded-lg"
+           th:text="${i + 1}">1</a>
+    </th:block>
+
+    <!-- Pagina 1 cuando no hay paginas -->
+    <a th:if="${totalPages == 0}"
+       class="px-3 py-2 text-sm font-medium border rounded-lg bg-red-600 text-white border-red-600">1</a>
+
+    <!-- Boton Siguiente -->
+    <a th:href="@{${baseUrl}(page=${currentPage + 1}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
+       th:classappend="${currentPage + 1 >= totalPages} ? 'pointer-events-none opacity-50' : ''"
+       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+        Siguiente
+    </a>
+</nav>

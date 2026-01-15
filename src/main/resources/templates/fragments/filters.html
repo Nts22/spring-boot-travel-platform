@@ -1,0 +1,63 @@
+<!-- Fragmentos de Filtros Reutilizables -->
+<!--
+    Uso para filtro simple (busqueda + estado):
+    th:replace="~{fragments/filters :: simpleFilter(actionUrl='/admin/usuarios', filtroBusqueda=${filtroBusqueda}, filtroEstado=${filtroEstado}, placeholder='Buscar por nombre...')}"
+
+    Parametros:
+    - actionUrl: URL del formulario
+    - filtroBusqueda: Valor actual del filtro de busqueda
+    - filtroEstado: Valor actual del filtro de estado
+    - placeholder: Texto placeholder del input de busqueda
+-->
+<div th:fragment="simpleFilter(actionUrl, filtroBusqueda, filtroEstado, placeholder)"
+     class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6"
+     xmlns:th="http://www.thymeleaf.org">
+    <form th:action="@{${actionUrl}}" method="GET" class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+            <input type="text" name="busqueda" th:value="${filtroBusqueda}"
+                   th:placeholder="${placeholder}"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+        </div>
+        <div class="sm:w-40">
+            <select name="estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                <option value="">Todos los estados</option>
+                <option value="ACT" th:selected="${filtroEstado == 'ACT'}">Activo</option>
+                <option value="INA" th:selected="${filtroEstado == 'INA'}">Inactivo</option>
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                Filtrar
+            </button>
+            <a th:href="@{${actionUrl}}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                Limpiar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Fragmento de Badge de Estado -->
+<!--
+    Uso: th:replace="~{fragments/filters :: estadoBadge(estado=${item.estado})}"
+-->
+<span th:fragment="estadoBadge(estado)"
+      th:class="'px-2 py-1 text-xs font-medium rounded-full ' +
+          (${estado == 'ACT'} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')"
+      th:text="${estado == 'ACT'} ? 'Activo' : 'Inactivo'"
+      xmlns:th="http://www.thymeleaf.org">Activo</span>
+
+<!-- Fragmento de Boton Toggle Estado -->
+<!--
+    Uso: th:replace="~{fragments/filters :: toggleButton(id=${item.id}, estado=${item.estado}, entityType='usuario')}"
+
+    entityType puede ser: usuario, destino, paquete, servicio
+-->
+<button th:fragment="toggleButton(id, estado, entityType)"
+        type="button"
+        th:data-id="${id}"
+        th:data-estado="${estado}"
+        th:data-entity="${entityType}"
+        onclick="toggleEstado(this)"
+        th:class="(${estado == 'ACT'} ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800')"
+        th:text="${estado == 'ACT'} ? 'Desactivar' : 'Activar'"
+        xmlns:th="http://www.thymeleaf.org">Toggle</button>
