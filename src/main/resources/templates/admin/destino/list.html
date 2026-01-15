@@ -1,9 +1,9 @@
 <!-- Destinos List -->
 <main class="flex-1 p-6" xmlns:th="http://www.thymeleaf.org">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-            <h2 class="text-xl font-semibold text-gray-800">Gestión de Destinos</h2>
-            <p class="text-gray-500 text-sm">Administra los destinos turísticos</p>
+            <h2 class="text-xl font-semibold text-gray-800">Gestion de Destinos</h2>
+            <p class="text-gray-500 text-sm">Administra los destinos turisticos</p>
         </div>
         <a href="/admin/destinos/nuevo" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -11,6 +11,32 @@
             </svg>
             Nuevo Destino
         </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <form th:action="@{/admin/destinos}" method="GET" class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+                <input type="text" name="busqueda" th:value="${filtroBusqueda}"
+                       placeholder="Buscar por nombre o pais..."
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+            </div>
+            <div class="sm:w-40">
+                <select name="estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <option value="">Todos los estados</option>
+                    <option value="ACT" th:selected="${filtroEstado == 'ACT'}">Activo</option>
+                    <option value="INA" th:selected="${filtroEstado == 'INA'}">Inactivo</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                    Filtrar
+                </button>
+                <a th:href="@{/admin/destinos}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                    Limpiar
+                </a>
+            </div>
+        </form>
     </div>
 
     <!-- Tabla de Destinos -->
@@ -62,19 +88,19 @@
     <!-- Paginación -->
     <div class="mt-6 flex justify-center">
         <nav class="flex items-center space-x-1">
-            <a th:href="@{/admin/destinos(page=${currentPage - 1})}"
+            <a th:href="@{/admin/destinos(page=${currentPage - 1}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
                th:classappend="${currentPage == 0} ? 'pointer-events-none opacity-50' : ''"
                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                 Anterior
             </a>
             <th:block th:if="${totalPages > 0}" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a th:href="@{/admin/destinos(page=${i})}"
+                <a th:href="@{/admin/destinos(page=${i}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
                    th:classappend="${i == currentPage} ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
                    class="px-3 py-2 text-sm font-medium border rounded-lg"
                    th:text="${i + 1}">1</a>
             </th:block>
             <a th:if="${totalPages == 0}" class="px-3 py-2 text-sm font-medium border rounded-lg bg-red-600 text-white border-red-600">1</a>
-            <a th:href="@{/admin/destinos(page=${currentPage + 1})}"
+            <a th:href="@{/admin/destinos(page=${currentPage + 1}, estado=${filtroEstado}, busqueda=${filtroBusqueda})}"
                th:classappend="${currentPage + 1 >= totalPages} ? 'pointer-events-none opacity-50' : ''"
                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                 Siguiente

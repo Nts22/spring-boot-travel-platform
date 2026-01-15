@@ -67,15 +67,33 @@ public class AdminWebController {
     // ==================== USUARIOS ====================
 
     @GetMapping("/usuarios")
-    public String listarUsuarios(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Usuario> usuarios = usuarioRepository.findAll(
-                PageRequest.of(page, PAGE_SIZE, Sort.by("idUsuario").descending()));
+    public String listarUsuarios(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(required = false) String estado,
+                                 @RequestParam(required = false) String busqueda,
+                                 Model model) {
+        Page<Usuario> usuarios;
+        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by("idUsuario").descending());
+
+        boolean tieneEstado = estado != null && !estado.isEmpty();
+        boolean tieneBusqueda = busqueda != null && !busqueda.trim().isEmpty();
+
+        if (tieneEstado && tieneBusqueda) {
+            usuarios = usuarioRepository.findByEstadoAndBusqueda(estado, busqueda.trim(), pageRequest);
+        } else if (tieneEstado) {
+            usuarios = usuarioRepository.findByEstado(estado, pageRequest);
+        } else if (tieneBusqueda) {
+            usuarios = usuarioRepository.findByBusqueda(busqueda.trim(), pageRequest);
+        } else {
+            usuarios = usuarioRepository.findAll(pageRequest);
+        }
 
         model.addAttribute("title", "Usuarios");
         model.addAttribute("activeMenu", "usuarios");
         model.addAttribute("usuarios", usuarios.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", usuarios.getTotalPages());
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("filtroBusqueda", busqueda);
         model.addAttribute("content", "admin/usuario/list");
         return "admin/layout";
     }
@@ -166,14 +184,32 @@ public class AdminWebController {
     // ==================== DESTINOS ====================
 
     @GetMapping("/destinos")
-    public String listarDestinos(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Destino> destinos = destinoRepository.findAllWithPaquetes(
-                PageRequest.of(page, PAGE_SIZE, Sort.by("idDestino").descending()));
+    public String listarDestinos(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(required = false) String estado,
+                                 @RequestParam(required = false) String busqueda,
+                                 Model model) {
+        Page<Destino> destinos;
+        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by("idDestino").descending());
+
+        boolean tieneEstado = estado != null && !estado.isEmpty();
+        boolean tieneBusqueda = busqueda != null && !busqueda.trim().isEmpty();
+
+        if (tieneEstado && tieneBusqueda) {
+            destinos = destinoRepository.findByEstadoAndBusquedaWithPaquetes(estado, busqueda.trim(), pageRequest);
+        } else if (tieneEstado) {
+            destinos = destinoRepository.findByEstadoWithPaquetes(estado, pageRequest);
+        } else if (tieneBusqueda) {
+            destinos = destinoRepository.findByBusquedaWithPaquetes(busqueda.trim(), pageRequest);
+        } else {
+            destinos = destinoRepository.findAllWithPaquetes(pageRequest);
+        }
 
         model.addAttribute("title", "Destinos");
         model.addAttribute("activeMenu", "destinos");
         model.addAttribute("destinos", destinos.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("filtroBusqueda", busqueda);
         model.addAttribute("totalPages", destinos.getTotalPages());
         model.addAttribute("content", "admin/destino/list");
         return "admin/layout";
@@ -240,15 +276,33 @@ public class AdminWebController {
     // ==================== PAQUETES ====================
 
     @GetMapping("/paquetes")
-    public String listarPaquetes(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Paquete> paquetes = paqueteRepository.findAllWithDestino(
-                PageRequest.of(page, PAGE_SIZE, Sort.by("idPaquete").descending()));
+    public String listarPaquetes(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(required = false) String estado,
+                                 @RequestParam(required = false) String busqueda,
+                                 Model model) {
+        Page<Paquete> paquetes;
+        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by("idPaquete").descending());
+
+        boolean tieneEstado = estado != null && !estado.isEmpty();
+        boolean tieneBusqueda = busqueda != null && !busqueda.trim().isEmpty();
+
+        if (tieneEstado && tieneBusqueda) {
+            paquetes = paqueteRepository.findByEstadoAndBusquedaWithDestino(estado, busqueda.trim(), pageRequest);
+        } else if (tieneEstado) {
+            paquetes = paqueteRepository.findByEstadoWithDestino(estado, pageRequest);
+        } else if (tieneBusqueda) {
+            paquetes = paqueteRepository.findByBusquedaWithDestino(busqueda.trim(), pageRequest);
+        } else {
+            paquetes = paqueteRepository.findAllWithDestino(pageRequest);
+        }
 
         model.addAttribute("title", "Paquetes");
         model.addAttribute("activeMenu", "paquetes");
         model.addAttribute("paquetes", paquetes.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", paquetes.getTotalPages());
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("filtroBusqueda", busqueda);
         model.addAttribute("content", "admin/paquete/list");
         return "admin/layout";
     }
@@ -338,15 +392,33 @@ public class AdminWebController {
     // ==================== SERVICIOS ====================
 
     @GetMapping("/servicios")
-    public String listarServicios(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<ServicioAdicional> servicios = servicioRepository.findAll(
-                PageRequest.of(page, PAGE_SIZE, Sort.by("idServicio").descending()));
+    public String listarServicios(@RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(required = false) String estado,
+                                  @RequestParam(required = false) String busqueda,
+                                  Model model) {
+        Page<ServicioAdicional> servicios;
+        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by("idServicio").descending());
+
+        boolean tieneEstado = estado != null && !estado.isEmpty();
+        boolean tieneBusqueda = busqueda != null && !busqueda.trim().isEmpty();
+
+        if (tieneEstado && tieneBusqueda) {
+            servicios = servicioRepository.findByEstadoAndBusqueda(estado, busqueda.trim(), pageRequest);
+        } else if (tieneEstado) {
+            servicios = servicioRepository.findByEstado(estado, pageRequest);
+        } else if (tieneBusqueda) {
+            servicios = servicioRepository.findByBusqueda(busqueda.trim(), pageRequest);
+        } else {
+            servicios = servicioRepository.findAll(pageRequest);
+        }
 
         model.addAttribute("title", "Servicios Adicionales");
         model.addAttribute("activeMenu", "servicios");
         model.addAttribute("servicios", servicios.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", servicios.getTotalPages());
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("filtroBusqueda", busqueda);
         model.addAttribute("content", "admin/servicio/list");
         return "admin/layout";
     }

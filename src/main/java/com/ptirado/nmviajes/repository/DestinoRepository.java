@@ -21,4 +21,25 @@ public interface DestinoRepository extends JpaRepository<Destino, Integer> {
     @Query(value = "SELECT d FROM Destino d LEFT JOIN FETCH d.paquetes",
            countQuery = "SELECT COUNT(d) FROM Destino d")
     Page<Destino> findAllWithPaquetes(Pageable pageable);
+
+    // Filtros para admin
+    @Query(value = "SELECT d FROM Destino d LEFT JOIN FETCH d.paquetes WHERE d.estado = :estado",
+           countQuery = "SELECT COUNT(d) FROM Destino d WHERE d.estado = :estado")
+    Page<Destino> findByEstadoWithPaquetes(@Param("estado") String estado, Pageable pageable);
+
+    @Query(value = "SELECT d FROM Destino d LEFT JOIN FETCH d.paquetes WHERE " +
+           "LOWER(d.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+           "LOWER(d.pais) LIKE LOWER(CONCAT('%', :busqueda, '%'))",
+           countQuery = "SELECT COUNT(d) FROM Destino d WHERE " +
+           "LOWER(d.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+           "LOWER(d.pais) LIKE LOWER(CONCAT('%', :busqueda, '%'))")
+    Page<Destino> findByBusquedaWithPaquetes(@Param("busqueda") String busqueda, Pageable pageable);
+
+    @Query(value = "SELECT d FROM Destino d LEFT JOIN FETCH d.paquetes WHERE d.estado = :estado AND " +
+           "(LOWER(d.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+           "LOWER(d.pais) LIKE LOWER(CONCAT('%', :busqueda, '%')))",
+           countQuery = "SELECT COUNT(d) FROM Destino d WHERE d.estado = :estado AND " +
+           "(LOWER(d.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+           "LOWER(d.pais) LIKE LOWER(CONCAT('%', :busqueda, '%')))")
+    Page<Destino> findByEstadoAndBusquedaWithPaquetes(@Param("estado") String estado, @Param("busqueda") String busqueda, Pageable pageable);
 }
