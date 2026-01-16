@@ -4,6 +4,7 @@ import com.ptirado.nmviajes.entity.*;
 import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 import com.ptirado.nmviajes.repository.*;
 import com.ptirado.nmviajes.service.AuthService;
+import com.ptirado.nmviajes.service.LogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,7 @@ public class AdminWebController {
     private final ServicioAdicionalRepository servicioRepository;
     private final ReservaRepository reservaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LogService logService;
 
     private static final int PAGE_SIZE = 10;
 
@@ -512,6 +514,41 @@ public class AdminWebController {
         model.addAttribute("activeMenu", "reservas");
         model.addAttribute("reserva", reserva);
         model.addAttribute("content", "admin/reserva/detail");
+        return "admin/layout";
+    }
+
+    // ==================== LOGS ====================
+
+    @GetMapping("/logs")
+    public String verLogs(@RequestParam(defaultValue = "500") int maxLines,
+                         @RequestParam(required = false) String level,
+                         @RequestParam(required = false) String search,
+                         Model model) {
+
+        // Obtener los logs
+        List<String> logs = logService.getLatestLogs(maxLines);
+
+        // Aplicar filtros
+        if (level != null && !level.isEmpty() && !level.equals("ALL")) {
+            logs = logService.filterLogsByLevel(logs, level);
+        }
+
+        if (search != null && !search.trim().isEmpty()) {
+            logs = logService.searchLogs(logs, search);
+        }
+
+        // Información adicional
+        model.addAttribute("title", "Logs del Sistema");
+        model.addAttribute("activeMenu", "logs");
+        model.addAttribute("logs", logs);
+        model.addAttribute("totalLines", logs.size());
+        model.addAttribute("maxLines", maxLines);
+        model.addAttribute("selectedLevel", level != null ? level : "ALL");
+        model.addAttribute("searchText", search);
+        model.addAttribute("logFileExists", logService.logFileExists());
+        model.addAttribute("logFilePath", logService.getLogFilePath().toString());
+        model.addAttribute("logFileSize", logService.getFormattedLogFileSize());
+        model.addAttribute("content", "admin/logs/view");
         return "admin/layout";
     }
 }

@@ -1,0 +1,143 @@
+<!-- Logs View -->
+<main class="flex-1 p-6" xmlns:th="http://www.thymeleaf.org">
+    <!-- Header -->
+    <th:block th:replace="~{fragments/admin-common :: pageHeader(
+        titulo='Logs del Sistema',
+        subtitulo='Monitorea los logs de la aplicación en tiempo real',
+        btnUrl='/admin',
+        btnTexto='Volver al Dashboard'
+    )}" />
+
+    <!-- Información del archivo de logs -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 mb-6">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-blue-900 mb-1">Información del Archivo</h3>
+                <div class="text-sm text-blue-700 space-y-1">
+                    <p><span class="font-medium">Ruta:</span> <code class="bg-white px-2 py-0.5 rounded text-xs" th:text="${logFilePath}"></code></p>
+                    <p><span class="font-medium">Tamaño:</span> <span th:text="${logFileSize}"></span></p>
+                    <p><span class="font-medium">Mostrando:</span> <span th:text="${totalLines}"></span> líneas
+                        <span th:if="${totalLines >= maxLines}" class="text-blue-600">(máximo configurado: <span th:text="${maxLines}"></span>)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <form th:action="@{/admin/logs}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Búsqueda -->
+                <div class="md:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Buscar en logs</label>
+                    <input type="text" id="search" name="search" th:value="${searchText}"
+                           placeholder="Buscar error, clase, método..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+
+                <!-- Nivel de log -->
+                <div>
+                    <label for="level" class="block text-sm font-medium text-gray-700 mb-2">Nivel</label>
+                    <select id="level" name="level" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white">
+                        <option value="ALL" th:selected="${selectedLevel == 'ALL'}">Todos</option>
+                        <option value="ERROR" th:selected="${selectedLevel == 'ERROR'}">ERROR</option>
+                        <option value="WARN" th:selected="${selectedLevel == 'WARN'}">WARN</option>
+                        <option value="INFO" th:selected="${selectedLevel == 'INFO'}">INFO</option>
+                        <option value="DEBUG" th:selected="${selectedLevel == 'DEBUG'}">DEBUG</option>
+                        <option value="TRACE" th:selected="${selectedLevel == 'TRACE'}">TRACE</option>
+                    </select>
+                </div>
+
+                <!-- Máximo de líneas -->
+                <div>
+                    <label for="maxLines" class="block text-sm font-medium text-gray-700 mb-2">Líneas</label>
+                    <select id="maxLines" name="maxLines" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white">
+                        <option value="100" th:selected="${maxLines == 100}">100</option>
+                        <option value="500" th:selected="${maxLines == 500}">500</option>
+                        <option value="1000" th:selected="${maxLines == 1000}">1000</option>
+                        <option value="2000" th:selected="${maxLines == 2000}">2000</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+                    <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Filtrar
+                </button>
+                <a th:href="@{/admin/logs}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                    Limpiar
+                </a>
+                <button type="button" onclick="location.reload()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors ml-auto">
+                    <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Refrescar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Visor de logs -->
+    <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 overflow-hidden">
+        <div class="bg-gray-800 px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="ml-4 text-sm font-mono text-gray-300">nmviajes.log</span>
+            </div>
+            <span class="text-xs text-gray-400" th:text="${totalLines} + ' líneas'">0 líneas</span>
+        </div>
+
+        <div class="p-4 overflow-x-auto" style="max-height: 600px; overflow-y: auto;">
+            <div th:if="${#lists.isEmpty(logs)}" class="text-center py-8">
+                <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-gray-400">No hay logs que mostrar</p>
+            </div>
+
+            <pre th:if="${!#lists.isEmpty(logs)}" class="font-mono text-xs text-gray-200 whitespace-pre-wrap break-words"><code><th:block th:each="line, iterStat : ${logs}"><span th:class="'log-line ' +
+    (${#strings.contains(line, 'ERROR')} ? 'text-red-400' : '') +
+    (${#strings.contains(line, 'WARN')} ? 'text-yellow-400' : '') +
+    (${#strings.contains(line, 'INFO')} ? 'text-green-400' : '') +
+    (${#strings.contains(line, 'DEBUG')} ? 'text-blue-400' : '') +
+    (${#strings.contains(line, 'TRACE')} ? 'text-purple-400' : '')" th:text="${line}"></span>
+</th:block></code></pre>
+        </div>
+    </div>
+
+    <!-- Leyenda de colores -->
+    <div class="mt-4 bg-white rounded-lg border border-gray-200 p-4">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">Leyenda de Niveles</h3>
+        <div class="flex flex-wrap gap-4 text-xs">
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full bg-red-400 mr-2"></span>
+                <span class="text-gray-600">ERROR - Errores críticos</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
+                <span class="text-gray-600">WARN - Advertencias</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full bg-green-400 mr-2"></span>
+                <span class="text-gray-600">INFO - Información general</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
+                <span class="text-gray-600">DEBUG - Depuración</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full bg-purple-400 mr-2"></span>
+                <span class="text-gray-600">TRACE - Trazas detalladas</span>
+            </div>
+        </div>
+    </div>
+</main>
