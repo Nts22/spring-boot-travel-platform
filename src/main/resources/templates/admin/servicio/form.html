@@ -1,50 +1,58 @@
 <!-- Servicio Form -->
-<main class="flex-1 p-6" xmlns:th="http://www.thymeleaf.org">
-    <div class="mb-6">
-        <a href="/admin/servicios" class="text-gray-500 hover:text-gray-700 flex items-center text-sm">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-            Volver a servicios
-        </a>
-    </div>
+<th:block th:replace="~{fragments/form-layout :: formContainer(
+    backUrl='/admin/servicios',
+    backText='Volver a servicios',
+    titulo=${servicio.idServicio != null ? 'Editar Servicio Adicional' : 'Nuevo Servicio Adicional'}
+)}">
+    <th:block th:fragment="formContent" xmlns:th="http://www.thymeleaf.org">
+        <form th:action="${servicio.idServicio != null} ? @{/admin/servicios/{id}(id=${servicio.idServicio})} : @{/admin/servicios}"
+              method="post">
 
-    <div class="max-w-2xl">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-6" th:text="${servicio.idServicio != null} ? 'Editar Servicio' : 'Nuevo Servicio'">Formulario Servicio</h2>
+            <!-- Nombre -->
+            <div class="mb-4">
+                <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre del Servicio <span class="text-red-600">*</span>
+                </label>
+                <input type="text" id="nombre" name="nombre" th:value="${servicio.nombre}"
+                       required placeholder="Ej: Guía turístico, Seguro de viaje, Transfer aeropuerto"
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+            </div>
 
-            <form th:action="${servicio.idServicio != null} ? @{/admin/servicios/{id}(id=${servicio.idServicio})} : @{/admin/servicios}"
-                  method="post" class="space-y-6">
+            <!-- Costo -->
+            <div class="mb-4">
+                <label for="costo" class="block text-sm font-medium text-gray-700 mb-2">
+                    Costo (S/) <span class="text-red-600">*</span>
+                </label>
+                <input type="number" id="costo" name="costo" th:value="${servicio.costo}"
+                       step="0.01" min="0" required placeholder="0.00"
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+                <p class="mt-1 text-sm text-gray-500">Costo adicional que se agregará al paquete</p>
+            </div>
 
-                <div>
-                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" th:value="${servicio.nombre}"
-                           required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                </div>
+            <!-- Estado -->
+            <div class="mb-4">
+                <label for="estado" class="block text-sm font-medium text-gray-700 mb-2">
+                    Estado <span class="text-red-600">*</span>
+                </label>
+                <select id="estado" name="estado" required
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors bg-white">
+                    <option value="ACT" th:selected="${servicio.estado == null || servicio.estado == 'ACT'}">Activo</option>
+                    <option value="INA" th:selected="${servicio.estado == 'INA'}">Inactivo</option>
+                </select>
+            </div>
 
-                <div>
-                    <label for="costo" class="block text-sm font-medium text-gray-700 mb-1">Costo (S/)</label>
-                    <input type="number" id="costo" name="costo" th:value="${servicio.costo}" step="0.01" min="0"
-                           required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                </div>
-
-                <div>
-                    <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                    <select id="estado" name="estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                        <option value="ACT" th:selected="${servicio.estado == null || servicio.estado == 'ACT'}">Activo</option>
-                        <option value="INA" th:selected="${servicio.estado == 'INA'}">Inactivo</option>
-                    </select>
-                </div>
-
-                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
-                    <a href="/admin/servicios" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">
-                        Cancelar
-                    </a>
-                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
-                        Guardar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</main>
+            <!-- Botones de accion -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 mt-8">
+                <a href="/admin/servicios" class="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Guardar Servicio
+                </button>
+            </div>
+        </form>
+    </th:block>
+</th:block>

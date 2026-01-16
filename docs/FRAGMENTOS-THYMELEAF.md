@@ -4,6 +4,142 @@ Esta carpeta contiene fragmentos reutilizables de Thymeleaf para mantener las vi
 
 ## Archivos
 
+### 0. `form-layout.html` ⭐ NUEVO
+Fragmentos reutilizables para formularios del admin con diseño centrado y consistente.
+
+#### Fragmento: `formContainer`
+Contenedor principal para formularios centrados con botón de retorno.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: formContainer(
+    backUrl='/admin/usuarios',
+    backText='Volver a usuarios',
+    titulo='Nuevo Usuario'
+)}">
+    <th:block th:fragment="formContent">
+        <form>
+            <!-- Campos del formulario aquí -->
+        </form>
+    </th:block>
+</th:block>
+```
+
+**Características:**
+- Layout centrado con `max-width-3xl` y `mx-auto`
+- Padding de 8 (más espacioso)
+- Botón de retorno con ícono
+- Título grande y prominente
+- Fondo blanco con sombra y bordes redondeados
+
+#### Fragmento: `textInput`
+Campo de texto reutilizable.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: textInput(
+    id='nombre',
+    label='Nombre',
+    name='nombre',
+    value=${entity.nombre},
+    required=true,
+    placeholder='Ingrese el nombre'
+)}" />
+```
+
+#### Fragmento: `emailInput`
+Campo de email.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: emailInput(
+    id='email',
+    label='Email',
+    name='email',
+    value=${entity.email},
+    required=true
+)}" />
+```
+
+#### Fragmento: `passwordInput`
+Campo de contraseña con texto de ayuda.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: passwordInput(
+    id='password',
+    label='Contraseña',
+    name='password',
+    required=true,
+    helpText='Mínimo 6 caracteres'
+)}" />
+```
+
+#### Fragmento: `numberInput`
+Campo numérico con opciones de min, max y step.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: numberInput(
+    id='precio',
+    label='Precio',
+    name='precio',
+    value=${entity.precio},
+    required=true,
+    min=0,
+    step=0.01
+)}" />
+```
+
+#### Fragmento: `dateInput`
+Campo de fecha.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: dateInput(
+    id='fechaInicio',
+    label='Fecha Inicio',
+    name='fechaInicio',
+    value=${entity.fechaInicio},
+    required=true
+)}" />
+```
+
+#### Fragmento: `textareaInput`
+Campo de texto multilínea.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: textareaInput(
+    id='descripcion',
+    label='Descripción',
+    name='descripcion',
+    value=${entity.descripcion},
+    rows=5
+)}" />
+```
+
+#### Fragmento: `estadoSelect`
+Select predefinido para Activo/Inactivo.
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: estadoSelect(value=${entity.estado})}" />
+```
+
+#### Fragmento: `formActions`
+Botones de acción del formulario (Cancelar/Guardar).
+
+**Uso:**
+```html
+<th:block th:replace="~{fragments/form-layout :: formActions(
+    cancelUrl='/admin/usuarios',
+    submitText='Guardar Usuario'
+)}" />
+```
+
+---
+
 ### 1. `pagination.html`
 Fragmento de paginación reutilizable con navegación por páginas.
 

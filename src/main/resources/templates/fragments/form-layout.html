@@ -1,0 +1,199 @@
+<!-- Fragmentos de Layout para Formularios -->
+<!--
+    Este archivo contiene fragmentos reutilizables para formularios del admin.
+    Proporciona layouts centrados y consistentes para crear/editar registros.
+-->
+<div xmlns:th="http://www.thymeleaf.org">
+
+    <!-- Contenedor de formulario centrado -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: formContainer(backUrl='/admin/usuarios', backText='Volver a usuarios', titulo='Nuevo Usuario')}"
+        Luego insertar el formulario dentro usando th:insert
+    -->
+    <main th:fragment="formContainer(backUrl, backText, titulo)" class="flex-1 p-6">
+        <!-- Boton de retorno -->
+        <div class="mb-6">
+            <a th:href="@{${backUrl}}" class="text-gray-500 hover:text-gray-700 flex items-center text-sm">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span th:text="${backText}">Volver</span>
+            </a>
+        </div>
+
+        <!-- Contenedor centrado con max-width -->
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6" th:text="${titulo}">Formulario</h2>
+
+                <!-- Aqui va el contenido del formulario -->
+                <th:block th:insert="~{::formContent}" />
+            </div>
+        </div>
+    </main>
+
+    <!-- Campo de texto input -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: textInput(id='nombre', label='Nombre', name='nombre', value=${entity.nombre}, required=true)}"
+    -->
+    <div th:fragment="textInput(id, label, name, value, required, placeholder)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <input type="text"
+               th:id="${id}"
+               th:name="${name}"
+               th:value="${value}"
+               th:placeholder="${placeholder}"
+               th:required="${required}"
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+    </div>
+
+    <!-- Campo de email -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: emailInput(id='email', label='Email', name='email', value=${entity.email}, required=true)}"
+    -->
+    <div th:fragment="emailInput(id, label, name, value, required)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <input type="email"
+               th:id="${id}"
+               th:name="${name}"
+               th:value="${value}"
+               th:required="${required}"
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+    </div>
+
+    <!-- Campo de password -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: passwordInput(id='password', label='Contraseña', name='password', required=true, helpText='Mínimo 6 caracteres')}"
+    -->
+    <div th:fragment="passwordInput(id, label, name, required, helpText)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <input type="password"
+               th:id="${id}"
+               th:name="${name}"
+               th:required="${required}"
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+        <p th:if="${helpText != null}" class="mt-1 text-sm text-gray-500" th:text="${helpText}">Help text</p>
+    </div>
+
+    <!-- Campo de numero -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: numberInput(id='precio', label='Precio', name='precio', value=${entity.precio}, required=true, min=0, step=0.01)}"
+    -->
+    <div th:fragment="numberInput(id, label, name, value, required, min, max, step)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <input type="number"
+               th:id="${id}"
+               th:name="${name}"
+               th:value="${value}"
+               th:required="${required}"
+               th:min="${min}"
+               th:max="${max}"
+               th:step="${step}"
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+    </div>
+
+    <!-- Campo de fecha -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: dateInput(id='fechaInicio', label='Fecha Inicio', name='fechaInicio', value=${entity.fechaInicio}, required=true)}"
+    -->
+    <div th:fragment="dateInput(id, label, name, value, required)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <input type="date"
+               th:id="${id}"
+               th:name="${name}"
+               th:value="${value}"
+               th:required="${required}"
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+    </div>
+
+    <!-- Campo de textarea -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: textareaInput(id='descripcion', label='Descripción', name='descripcion', value=${entity.descripcion}, rows=4)}"
+    -->
+    <div th:fragment="textareaInput(id, label, name, value, required, rows)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <textarea th:id="${id}"
+                  th:name="${name}"
+                  th:rows="${rows} ?: 4"
+                  th:required="${required}"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                  th:text="${value}"></textarea>
+    </div>
+
+    <!-- Campo de select -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: selectInput(id='estado', label='Estado', name='estado', required=true)}"
+        Luego agregar options dentro
+    -->
+    <div th:fragment="selectInput(id, label, name, required)" class="mb-4">
+        <label th:for="${id}" class="block text-sm font-medium text-gray-700 mb-2">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required}" class="text-red-600">*</span>
+        </label>
+        <select th:id="${id}"
+                th:name="${name}"
+                th:required="${required}"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors bg-white">
+            <th:block th:insert="~{::selectOptions}" />
+        </select>
+    </div>
+
+    <!-- Select de Estado (Activo/Inactivo) -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: estadoSelect(value=${entity.estado})}"
+    -->
+    <div th:fragment="estadoSelect(value)" class="mb-4">
+        <label for="estado" class="block text-sm font-medium text-gray-700 mb-2">
+            Estado <span class="text-red-600">*</span>
+        </label>
+        <select id="estado" name="estado" required
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors bg-white">
+            <option value="ACT" th:selected="${value == null || value == 'ACT'}">Activo</option>
+            <option value="INA" th:selected="${value == 'INA'}">Inactivo</option>
+        </select>
+    </div>
+
+    <!-- Botones de accion del formulario -->
+    <!--
+        Uso: th:replace="~{fragments/form-layout :: formActions(cancelUrl='/admin/usuarios', submitText='Guardar')}"
+    -->
+    <div th:fragment="formActions(cancelUrl, submitText)" class="flex justify-end space-x-4 pt-6 border-t border-gray-200 mt-8">
+        <a th:href="@{${cancelUrl}}" class="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">
+            Cancelar
+        </a>
+        <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm">
+            <span th:text="${submitText}">Guardar</span>
+        </button>
+    </div>
+
+    <!-- Grid de 2 columnas para campos -->
+    <!--
+        Uso: Envolver campos en este fragmento para layout de 2 columnas
+        <div th:replace="~{fragments/form-layout :: grid2Cols}">
+            <div th:insert="~{fragments/form-layout :: textInput(...)}"></div>
+            <div th:insert="~{fragments/form-layout :: textInput(...)}"></div>
+        </div>
+    -->
+    <div th:fragment="grid2Cols" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <th:block th:insert="~{::gridContent}" />
+    </div>
+
+</div>
