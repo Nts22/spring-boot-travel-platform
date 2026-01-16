@@ -5,6 +5,7 @@ import com.ptirado.nmviajes.entity.Reserva.EstadoReserva;
 import com.ptirado.nmviajes.repository.*;
 import com.ptirado.nmviajes.service.AuthService;
 import com.ptirado.nmviajes.service.LogService;
+import com.ptirado.nmviajes.service.LogStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ public class AdminWebController {
     private final ReservaRepository reservaRepository;
     private final PasswordEncoder passwordEncoder;
     private final LogService logService;
+    private final LogStatsService logStatsService;
 
     private static final int PAGE_SIZE = 10;
 
@@ -549,6 +551,23 @@ public class AdminWebController {
         model.addAttribute("logFilePath", logService.getLogFilePath().toString());
         model.addAttribute("logFileSize", logService.getFormattedLogFileSize());
         model.addAttribute("content", "admin/logs/view");
+        return "admin/layout";
+    }
+
+    @GetMapping("/logs/stats")
+    public String verEstadisticasLogs(@RequestParam(defaultValue = "7") int days, Model model) {
+        // Obtener datos para gráficas
+        Map<String, Object> chartDataByDay = logStatsService.getChartDataByDay(days);
+        Map<String, Object> chartDataByHour = logStatsService.getChartDataByHour();
+        Map<String, Integer> logLevelSummary = logStatsService.getLogLevelSummary();
+
+        model.addAttribute("title", "Estadísticas de Logs");
+        model.addAttribute("activeMenu", "logs");
+        model.addAttribute("chartDataByDay", chartDataByDay);
+        model.addAttribute("chartDataByHour", chartDataByHour);
+        model.addAttribute("logLevelSummary", logLevelSummary);
+        model.addAttribute("selectedDays", days);
+        model.addAttribute("content", "admin/logs/stats");
         return "admin/layout";
     }
 }
